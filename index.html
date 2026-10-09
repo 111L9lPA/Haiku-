@@ -3,158 +3,202 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Мини сайт</title>
+  <title>Рабочая доска</title>
   <style>
+    :root {
+      --bg: #f2f1f7; --card: #ffffff; --fg: #1d1a2e; --muted: #6b6785;
+      --accent: #5b3fd4; --accent-fg: #ffffff; --line: #e2dff0; --danger: #c0392b;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #15122a; --card: #201c3b; --fg: #efecfb; --muted: #a29ec2;
+        --accent: #9b86ff; --accent-fg: #15122a; --line: #322d55; --danger: #ff8a80;
+      }
+    }
     * { box-sizing: border-box; }
     body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      padding: 40px 16px;
-      font-family: system-ui, sans-serif;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      background-attachment: fixed;
-      color: #fff;
-      text-align: center;
+      margin: 0; padding: 24px 16px 48px;
+      font-family: system-ui, sans-serif; background: var(--bg); color: var(--fg);
     }
-    h1, h2, p { margin: 0; }
-    p { font-size: 20px; font-variant-numeric: tabular-nums; }
-    button, .upload {
-      padding: 14px 32px;
-      font-size: 18px;
-      border: none;
-      border-radius: 12px;
-      background: #fff;
-      color: #764ba2;
-      cursor: pointer;
-      transition: transform .15s;
+    main { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    h1 { margin: 0; font-size: 28px; }
+    h2 { margin: 0; font-size: 18px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .row { display: flex; gap: 8px; align-items: center; }
+    input[type=text] {
+      flex: 1; min-width: 0; padding: 12px; font: inherit; color: var(--fg);
+      background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
     }
-    button:hover, .upload:hover { transform: scale(1.05); }
-    button:active, .upload:active { transform: scale(0.97); }
+    button, .btn {
+      padding: 12px 18px; font: inherit; font-weight: 600; border: 0; border-radius: 10px;
+      background: var(--accent); color: var(--accent-fg); cursor: pointer; text-align: center;
+    }
     button:disabled { opacity: .6; cursor: default; }
-    section { width: 100%; max-width: 720px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
-    .upload input { display: none; }
-    #status { font-size: 16px; min-height: 1.2em; }
-    #gallery {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 12px;
+    .ghost { background: transparent; color: var(--muted); padding: 6px 10px; font-weight: 400; }
+    .ghost:hover { color: var(--danger); }
+    .btn input { display: none; }
+    ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+    li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+    li:first-child { border-top: 0; }
+    li label { flex: 1; min-width: 0; overflow-wrap: anywhere; cursor: pointer; }
+    li.done label { text-decoration: line-through; color: var(--muted); }
+    input[type=checkbox] { width: 22px; height: 22px; accent-color: var(--accent); flex: none; }
+    .muted { color: var(--muted); font-size: 14px; }
+    #files a.file {
+      flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px;
+      color: var(--fg); text-decoration: none; overflow-wrap: anywhere;
     }
-    #gallery a {
-      display: block;
-      aspect-ratio: 1;
-      border-radius: 12px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, .15);
-    }
-    #gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #files a.file:hover span { text-decoration: underline; }
+    .thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; flex: none; background: var(--line); }
+    .ext { width: 44px; height: 44px; border-radius: 8px; flex: none; display: grid; place-items: center;
+      background: var(--line); color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; }
   </style>
 </head>
 <body>
-  <h1>Привет! 👋</h1>
+<main>
+  <h1>Рабочая доска</h1>
 
-  <section>
-    <p id="count">Всего нажатий: …</p>
-    <button id="btn">Нажми меня</button>
+  <section class="card">
+    <h2>Задачи</h2>
+    <form id="taskForm" class="row">
+      <input id="taskText" type="text" maxlength="200" placeholder="Новая задача" autocomplete="off">
+      <button type="submit">Добавить</button>
+    </form>
+    <ul id="tasks"></ul>
+    <div id="tasksNote" class="muted"></div>
   </section>
 
-  <section>
-    <h2>Фото</h2>
-    <label class="upload">
-      Загрузить фото
-      <input id="file" type="file" accept="image/jpeg,image/png,image/gif,image/webp" multiple>
+  <section class="card">
+    <h2>Файлы</h2>
+    <label class="btn">
+      Загрузить файлы
+      <input id="file" type="file" multiple
+        accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip">
     </label>
-    <div id="status"></div>
-    <div id="gallery"></div>
+    <div id="status" class="muted"></div>
+    <ul id="files"></ul>
+    <div class="muted">Фото, PDF, документы Word и Excel, текст, zip. До 20 МБ на файл.</div>
   </section>
+</main>
 
-  <script>
-    // Публичный (publishable) ключ Supabase: безопасно хранить в коде.
-    // Доступ ограничен правилами в базе.
-    const URL_ = "https://exmxqybejhbtnbtqcwms.supabase.co";
-    const KEY = "sb_publishable_H_c3d5terU1y4slV6t-ChQ_bnfECYM2";
-    const headers = { apikey: KEY, "Content-Type": "application/json" };
+<script>
+  // Публичный (publishable) ключ Supabase: безопасно хранить в коде.
+  const URL_ = "https://exmxqybejhbtnbtqcwms.supabase.co";
+  const KEY = "sb_publishable_H_c3d5terU1y4slV6t-ChQ_bnfECYM2";
+  const H = { apikey: KEY, "Content-Type": "application/json" };
 
-    // ---- Счётчик ----
-    const countEl = document.getElementById("count");
-    const btn = document.getElementById("btn");
-    const show = (n) => { countEl.textContent = "Всего нажатий: " + n; };
-    const fail = () => { countEl.textContent = "Не удалось связаться с базой"; };
+  // ---------- Задачи ----------
+  const tasksEl = document.getElementById("tasks");
+  const tasksNote = document.getElementById("tasksNote");
+  const taskForm = document.getElementById("taskForm");
+  const taskText = document.getElementById("taskText");
 
-    fetch(URL_ + "/rest/v1/clicks?id=eq.1&select=total", { headers })
+  function renderTasks(rows) {
+    tasksEl.textContent = "";
+    tasksNote.textContent = rows.length ? "" : "Пока задач нет. Добавьте первую.";
+    rows.forEach((t) => {
+      const li = document.createElement("li");
+      if (t.done) li.className = "done";
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.checked = t.done; cb.id = "t" + t.id;
+      cb.addEventListener("change", () => api("PATCH", "?id=eq." + t.id, { done: cb.checked }));
+      const label = document.createElement("label");
+      label.htmlFor = cb.id; label.textContent = t.text;
+      const del = document.createElement("button");
+      del.className = "ghost"; del.type = "button"; del.textContent = "Удалить"; del.setAttribute("aria-label", "Удалить задачу");
+      del.addEventListener("click", () => api("DELETE", "?id=eq." + t.id));
+      li.append(cb, label, del);
+      tasksEl.appendChild(li);
+    });
+  }
+
+  function api(method, query, body) {
+    return fetch(URL_ + "/rest/v1/tasks" + (query || ""), {
+      method, headers: { ...H, Prefer: "return=minimal" }, body: body ? JSON.stringify(body) : undefined
+    }).then((r) => { if (!r.ok) throw new Error(); }).then(loadTasks)
+      .catch(() => { tasksNote.textContent = "Не удалось сохранить. Обновите страницу."; });
+  }
+
+  function loadTasks() {
+    return fetch(URL_ + "/rest/v1/tasks?select=id,text,done&order=done.asc,created_at.desc", { headers: H })
       .then((r) => r.json())
-      .then((rows) => show(rows[0].total))
-      .catch(fail);
+      .then((rows) => { if (!Array.isArray(rows)) throw new Error(); renderTasks(rows); })
+      .catch(() => { tasksNote.textContent = "Не удалось загрузить задачи."; });
+  }
 
-    btn.addEventListener("click", () => {
-      btn.disabled = true;
-      fetch(URL_ + "/rest/v1/rpc/add_click", { method: "POST", headers, body: "{}" })
-        .then((r) => r.json())
-        .then(show)
-        .catch(fail)
-        .finally(() => { btn.disabled = false; });
-    });
+  taskForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = taskText.value.trim();
+    if (!text) return;
+    taskText.value = "";
+    api("POST", "", { text });
+  });
 
-    // ---- Фото ----
-    const gallery = document.getElementById("gallery");
-    const statusEl = document.getElementById("status");
-    const fileInput = document.getElementById("file");
-    const publicUrl = (name) => URL_ + "/storage/v1/object/public/photos/" + encodeURIComponent(name);
+  // ---------- Файлы ----------
+  const filesEl = document.getElementById("files");
+  const statusEl = document.getElementById("status");
+  const fileInput = document.getElementById("file");
+  const fileUrl = (name) => URL_ + "/storage/v1/object/public/photos/" + encodeURIComponent(name);
+  const isImage = (n) => /\.(jpe?g|png|gif|webp)$/i.test(n);
+  const shortName = (n) => n.replace(/^\d+-[a-z0-9]{6}-/, "");
 
-    function loadPhotos() {
-      fetch(URL_ + "/storage/v1/object/list/photos", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ prefix: "", limit: 100, sortBy: { column: "created_at", order: "desc" } })
-      })
-        .then((r) => r.json())
-        .then((items) => {
-          gallery.textContent = "";
-          if (!Array.isArray(items)) throw new Error("bad response");
-          items.filter((i) => i.name && i.id).forEach((i) => {
-            const a = document.createElement("a");
-            a.href = publicUrl(i.name);
-            a.target = "_blank";
-            a.rel = "noopener";
+  function loadFiles() {
+    fetch(URL_ + "/storage/v1/object/list/photos", {
+      method: "POST", headers: H,
+      body: JSON.stringify({ prefix: "", limit: 200, sortBy: { column: "created_at", order: "desc" } })
+    })
+      .then((r) => r.json())
+      .then((items) => {
+        if (!Array.isArray(items)) throw new Error();
+        filesEl.textContent = "";
+        items.filter((i) => i.name && i.id).forEach((i) => {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.className = "file"; a.href = fileUrl(i.name); a.target = "_blank"; a.rel = "noopener";
+          if (isImage(i.name)) {
             const img = document.createElement("img");
-            img.src = publicUrl(i.name);
-            img.loading = "lazy";
-            img.alt = "";
+            img.className = "thumb"; img.src = fileUrl(i.name); img.loading = "lazy"; img.alt = "";
             a.appendChild(img);
-            gallery.appendChild(a);
-          });
-        })
-        .catch(() => { statusEl.textContent = "Не удалось загрузить список фото"; });
+          } else {
+            const ext = document.createElement("div");
+            ext.className = "ext"; ext.textContent = (i.name.split(".").pop() || "").slice(0, 4);
+            a.appendChild(ext);
+          }
+          const span = document.createElement("span");
+          span.textContent = shortName(i.name);
+          a.appendChild(span);
+          li.appendChild(a);
+          filesEl.appendChild(li);
+        });
+      })
+      .catch(() => { statusEl.textContent = "Не удалось загрузить список файлов"; });
+  }
+
+  fileInput.addEventListener("change", async () => {
+    const files = Array.from(fileInput.files);
+    let ok = 0;
+    for (const [i, f] of files.entries()) {
+      statusEl.textContent = "Загрузка " + (i + 1) + " из " + files.length + "…";
+      const safe = f.name.replace(/[^A-Za-z0-9._-]/g, "_").slice(-80);
+      const name = Date.now() + "-" + Math.random().toString(36).slice(2, 8) + "-" + safe;
+      try {
+        const r = await fetch(URL_ + "/storage/v1/object/photos/" + name, {
+          method: "POST",
+          headers: { apikey: KEY, "Content-Type": f.type || "application/octet-stream", "x-upsert": "false" },
+          body: f
+        });
+        if (r.ok) ok++;
+      } catch (e) { /* считаем неудачей */ }
     }
+    statusEl.textContent = ok === files.length
+      ? "Готово: загружено " + ok
+      : "Загружено " + ok + " из " + files.length + ". Проверьте тип и размер (до 20 МБ).";
+    fileInput.value = "";
+    loadFiles();
+  });
 
-    fileInput.addEventListener("change", async () => {
-      const files = Array.from(fileInput.files);
-      let ok = 0;
-      for (const [i, f] of files.entries()) {
-        statusEl.textContent = "Загрузка " + (i + 1) + " из " + files.length + "…";
-        const ext = (f.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
-        const name = Date.now() + "-" + Math.random().toString(36).slice(2, 8) + "." + ext;
-        try {
-          const r = await fetch(URL_ + "/storage/v1/object/photos/" + name, {
-            method: "POST",
-            headers: { apikey: KEY, "Content-Type": f.type, "x-upsert": "false" },
-            body: f
-          });
-          if (r.ok) ok++;
-        } catch (e) { /* считаем как неудачу */ }
-      }
-      statusEl.textContent = ok === files.length
-        ? "Готово: загружено " + ok
-        : "Загружено " + ok + " из " + files.length + ". Файл должен быть фото до 10 МБ.";
-      fileInput.value = "";
-      loadPhotos();
-    });
-
-    loadPhotos();
-  </script>
+  loadTasks();
+  loadFiles();
+</script>
 </body>
 </html>
