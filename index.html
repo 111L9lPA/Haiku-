@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Мини сайт</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      font-family: system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      text-align: center;
+    }
+    button {
+      padding: 14px 32px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background: #fff;
+      color: #764ba2;
+      cursor: pointer;
+      transition: transform .15s;
+    }
+    button:hover { transform: scale(1.05); }
+    button:active { transform: scale(0.97); }
+  </style>
+</head>
+<body>
+  <h1 id="title">Привет! 👋</h1>
+  <p id="count">Нажатий: 0</p>
+  <button id="btn">Нажми меня</button>
+  <script>
+    let n = 0;
+    const phrases = ["Отлично!", "Ещё раз!", "Круто!", "Ты молодец!", "Так держать!"];
+    document.getElementById("btn").addEventListener("click", () => {
+      n++;
+      document.getElementById("count").textContent = "Нажатий: " + n;
+      document.getElementById("title").textContent = phrases[n % phrases.length];
+    });
+  </script>
+</body>
+</html>
