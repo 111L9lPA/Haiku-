@@ -13,11 +13,14 @@
       align-items: center;
       justify-content: center;
       gap: 20px;
+      padding: 0 16px;
+      box-sizing: border-box;
       font-family: system-ui, sans-serif;
       background: linear-gradient(135deg, #667eea, #764ba2);
       color: #fff;
       text-align: center;
     }
+    p { margin: 0; font-size: 20px; font-variant-numeric: tabular-nums; }
     button {
       padding: 14px 32px;
       font-size: 18px;
@@ -30,19 +33,37 @@
     }
     button:hover { transform: scale(1.05); }
     button:active { transform: scale(0.97); }
+    button:disabled { opacity: .6; cursor: default; }
   </style>
 </head>
 <body>
-  <h1 id="title">Привет! 👋</h1>
-  <p id="count">Нажатий: 0</p>
+  <h1>Привет! 👋</h1>
+  <p id="count">Всего нажатий: …</p>
   <button id="btn">Нажми меня</button>
   <script>
-    let n = 0;
-    const phrases = ["Отлично!", "Ещё раз!", "Круто!", "Ты молодец!", "Так держать!"];
-    document.getElementById("btn").addEventListener("click", () => {
-      n++;
-      document.getElementById("count").textContent = "Нажатий: " + n;
-      document.getElementById("title").textContent = phrases[n % phrases.length];
+    // Публичный (publishable) ключ Supabase: безопасно хранить в коде.
+    // Доступ ограничен правилами RLS в базе.
+    const URL_ = "https://exmxqybejhbtnbtqcwms.supabase.co";
+    const KEY = "sb_publishable_H_c3d5terU1y4slV6t-ChQ_bnfECYM2";
+    const headers = { apikey: KEY, "Content-Type": "application/json" };
+    const countEl = document.getElementById("count");
+    const btn = document.getElementById("btn");
+
+    const show = (n) => { countEl.textContent = "Всего нажатий: " + n; };
+    const fail = () => { countEl.textContent = "Не удалось связаться с базой"; };
+
+    fetch(URL_ + "/rest/v1/clicks?id=eq.1&select=total", { headers })
+      .then((r) => r.json())
+      .then((rows) => show(rows[0].total))
+      .catch(fail);
+
+    btn.addEventListener("click", () => {
+      btn.disabled = true;
+      fetch(URL_ + "/rest/v1/rpc/add_click", { method: "POST", headers, body: "{}" })
+        .then((r) => r.json())
+        .then(show)
+        .catch(fail)
+        .finally(() => { btn.disabled = false; });
     });
   </script>
 </body>
