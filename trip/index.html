@@ -4,181 +4,97 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0d0a12">
-  <title>Отпуск в Китае</title>
+  <title>Китай-радар</title>
+  <meta name="description" content="Ищем самый дешёвый билет в Китай из Москвы и Краснодара">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Golos+Text:wght@400;600&family=Ma+Shan+Zheng&display=swap">
+  <link rel="stylesheet" href="common.css?v=5">
   <style>
-    /* Layout: ночной Пекин. Фото-герой с маршрутом и отсчётом, затем лучшая цена
-       и список билетов в виде посадочных талонов. Один тёмный образ по задумке. */
-    :root {
-      --ink: #0d0a12;
-      --ink-2: #17121f;
-      --ink-3: #231b2f;
-      --paper: #f6efe4;
-      --muted: #a99db8;
-      --red: #e0372f;
-      --red-hot: #ff5a4a;
-      --gold: #f4b942;
-      --jade: #43c6a5;
-      --line: rgba(255, 255, 255, .11);
-      --display: "Unbounded", "Arial Black", system-ui, sans-serif;
-      --body: "Golos Text", system-ui, sans-serif;
-      --brush: "Ma Shan Zheng", "STKaiti", "KaiTi", serif;
-      color-scheme: dark;
-    }
-    * { box-sizing: border-box; }
-    html { background: var(--ink); }
-    body {
-      margin: 0;
-      padding-inline: 16px;
-      padding-block: 0 48px;
-      font-family: var(--body);
-      color: var(--paper);
-      background:
-        radial-gradient(900px 500px at 50% -10%, rgba(224, 55, 47, .22), transparent 70%),
-        repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 1px, transparent 1px 28px),
-        var(--ink);
-      -webkit-font-smoothing: antialiased;
-    }
-    main { max-width: 620px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
-    h1, h2, p { margin: 0; }
-
-    /* ---------- Герой ---------- */
-    .hero {
-      position: relative;
-      margin-inline: -16px;
-      aspect-ratio: 1 / 1;
-      max-height: 78vh;
-      overflow: hidden;
-      border-radius: 0 0 28px 28px;
-      isolation: isolate;
-    }
-    @media (min-width: 640px) { .hero { margin-inline: 0; border-radius: 0 0 28px 28px; } }
-    .hero img {
-      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-      animation: drift 22s ease-in-out infinite alternate;
-      z-index: -2;
-    }
-    .hero::after {
-      content: ""; position: absolute; inset: 0; z-index: -1;
-      background: linear-gradient(180deg, rgba(13,10,18,.55) 0%, rgba(13,10,18,0) 30%, rgba(13,10,18,.55) 62%, var(--ink) 100%);
-    }
-    @keyframes drift { from { transform: scale(1.04) translateY(0); } to { transform: scale(1.16) translateY(-2%); } }
-
+    /* ---------- герой ---------- */
+    .hero { position: relative; margin-inline: -16px; aspect-ratio: 1 / 1; max-height: 80vh; overflow: hidden; border-radius: 0 0 28px 28px; isolation: isolate; }
+    @media (min-width: 712px) { .hero { margin-inline: 0; } }
+    .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; animation: drift 22s ease-in-out infinite alternate; }
+    .hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(13,10,18,.55) 0%, rgba(13,10,18,0) 28%, rgba(13,10,18,.5) 60%, var(--ink) 100%); }
+    @keyframes drift { from { transform: scale(1.04); } to { transform: scale(1.16) translateY(-2%); } }
     .hero-top { position: absolute; top: 18px; left: 18px; right: 18px; display: flex; justify-content: space-between; align-items: flex-start; }
-    .kanji { font-family: var(--brush); font-size: 44px; line-height: 1; color: var(--gold); text-shadow: 0 2px 18px rgba(0,0,0,.6); animation: rise .9s .1s both; }
-    .stamp {
-      font-family: var(--display); font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
-      color: var(--paper); border: 1.5px solid rgba(246,239,228,.6); border-radius: 6px; padding: 6px 9px; transform: rotate(4deg);
-      background: rgba(13,10,18,.35); backdrop-filter: blur(4px); animation: rise .9s .3s both;
-    }
-    .hero-bottom { position: absolute; left: 20px; right: 20px; bottom: 22px; display: flex; flex-direction: column; gap: 14px; }
-
-    .route { display: flex; align-items: center; gap: 12px; font-family: var(--display); font-weight: 800; animation: rise .9s .35s both; }
-    .iata { font-size: clamp(30px, 10vw, 44px); letter-spacing: -.02em; }
-    .track { position: relative; flex: 1; height: 24px; }
+    .logo { font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; padding: 8px 11px; border-radius: 10px; background: rgba(13,10,18,.45); backdrop-filter: blur(6px); border: 1px solid rgba(246,239,228,.25); animation: rise .8s .1s both; }
+    .logo b { color: var(--red-hot); }
+    .stamp { font-family: var(--brush); font-size: 40px; line-height: 1; color: var(--gold); text-shadow: 0 2px 18px rgba(0,0,0,.6); animation: rise .8s .25s both; }
+    .hero-bottom { position: absolute; left: 20px; right: 20px; bottom: 22px; display: flex; flex-direction: column; gap: 12px; }
+    .route { display: flex; align-items: center; gap: 12px; font-family: var(--display); font-weight: 800; animation: rise .8s .35s both; }
+    .iata { font-size: clamp(26px, 9vw, 40px); letter-spacing: -.02em; white-space: nowrap; }
+    .iata.cn { font-family: var(--brush); font-weight: 400; color: var(--gold); font-size: clamp(34px, 11vw, 50px); }
+    .track { position: relative; flex: 1; height: 24px; min-width: 40px; }
     .track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px dashed rgba(246,239,228,.55); }
     .plane { position: absolute; top: 50%; left: 0; width: 22px; height: 22px; margin-top: -11px; color: var(--gold); animation: fly 4.5s ease-in-out infinite; }
-    @keyframes fly { 0% { left: 0; opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { left: calc(100% - 22px); opacity: 0; } }
-
-    .count { display: flex; align-items: baseline; gap: 10px; animation: rise .9s .5s both; }
-    .count b { font-family: var(--display); font-size: clamp(54px, 18vw, 84px); font-weight: 800; line-height: .95; color: var(--paper); font-variant-numeric: tabular-nums; }
+    @keyframes fly { 0% { left: 0; opacity: 0; } 12%, 88% { opacity: 1; } 100% { left: calc(100% - 22px); opacity: 0; } }
+    .count { display: flex; align-items: baseline; gap: 10px; animation: rise .8s .5s both; }
+    .count b { font-family: var(--display); font-size: clamp(54px, 18vw, 84px); font-weight: 800; line-height: .95; font-variant-numeric: tabular-nums; }
     .count span { font-size: 16px; color: var(--muted); line-height: 1.25; }
-    .count span em { display: block; font-style: normal; color: var(--gold); font-weight: 600; }
+    .count em { display: block; font-style: normal; color: var(--gold); font-weight: 600; }
 
-    /* ---------- Лучшая цена ---------- */
-    .best {
-      position: relative; border-radius: 24px; padding: 22px 20px 20px;
-      background: linear-gradient(160deg, var(--ink-3), var(--ink-2));
-      border: 1px solid var(--line);
-      display: flex; flex-direction: column; gap: 14px; overflow: hidden;
-      animation: rise .8s .6s both;
-    }
-    .best::before {
-      content: ""; position: absolute; width: 260px; height: 260px; right: -90px; top: -120px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(244,185,66,.28), transparent 65%); pointer-events: none;
-    }
-    .eyebrow { font-family: var(--display); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
-    .big { font-family: var(--display); font-weight: 800; font-size: clamp(38px, 12vw, 56px); letter-spacing: -.02em; line-height: 1; font-variant-numeric: tabular-nums; }
-    .big small { font-size: .45em; color: var(--muted); font-weight: 500; margin-left: 4px; }
-    .meta { color: var(--muted); font-size: 15px; line-height: 1.45; }
-    .meta b { color: var(--paper); font-weight: 600; }
+    /* ---------- карточки цен ---------- */
+    .plan::before { content: ""; position: absolute; width: 280px; height: 280px; right: -100px; top: -130px; border-radius: 50%; background: radial-gradient(circle, rgba(244,185,66,.26), transparent 65%); pointer-events: none; }
+    .plan-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .mini { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+    .mini a { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 11px 2px; border-top: 1px solid var(--line); color: var(--paper); text-decoration: none; transition: background .2s; border-radius: 8px; }
+    .mini a:hover { background: rgba(255,255,255,.03); }
+    .mini .r { font-weight: 600; font-size: 15px; min-width: 0; overflow-wrap: anywhere; }
+    .mini .p { font-family: var(--display); font-weight: 800; font-size: 16px; text-align: right; font-variant-numeric: tabular-nums; }
+    .mini .s { grid-column: 1 / -1; font-size: 13px; color: var(--muted); }
+    .spark-wrap { display: flex; flex-direction: column; gap: 6px; }
+    .wild { background: linear-gradient(160deg, #2b1418, var(--ink-2)); border-color: rgba(224,55,47,.35); }
+    .row-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .row-btns > * { flex: 1 1 200px; }
 
-    .cta {
-      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-      padding: 16px 22px; border-radius: 16px; border: 0; cursor: pointer; text-decoration: none;
-      font-family: var(--display); font-weight: 500; font-size: 14px; letter-spacing: .02em; color: #fff;
-      background: linear-gradient(135deg, var(--red-hot), var(--red));
-      box-shadow: 0 10px 28px -8px rgba(224,55,47,.7);
-      transition: transform .18s, box-shadow .18s;
-      position: relative; overflow: hidden;
+    /* ---------- города ---------- */
+    .cities { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (min-width: 600px) { .cities { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .city {
+      position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 4px; min-height: 150px;
+      padding: 14px; border-radius: 18px; text-decoration: none; color: var(--paper);
+      background: var(--ink-2); border: 1px solid var(--line);
+      animation: rise .5s calc(min(var(--i), 12) * 45ms + .1s) both; transition: transform .2s, border-color .2s;
     }
-    .cta::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%); transform: translateX(-120%); animation: shine 3.8s 1.5s infinite; }
-    @keyframes shine { 0%, 55% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
-    .cta:hover { transform: translateY(-2px); box-shadow: 0 14px 32px -8px rgba(224,55,47,.85); }
-    .cta:active { transform: translateY(0) scale(.98); }
-    .cta[hidden] { display: none; }
+    .city:hover { transform: translateY(-3px); border-color: rgba(244,185,66,.55); }
+    .city .hz { position: absolute; right: -6px; bottom: -14px; font-family: var(--brush); font-size: 74px; line-height: 1; color: rgba(244,185,66,.1); pointer-events: none; white-space: nowrap; }
+    .city .rank { font-family: var(--display); font-size: 11px; color: var(--muted); }
+    .city .name { font-family: var(--display); font-weight: 800; font-size: 16px; letter-spacing: -.01em; }
+    .city .vibe { font-size: 12px; color: var(--muted); line-height: 1.3; }
+    .city .price { margin-top: auto; padding-top: 8px; font-family: var(--display); font-weight: 800; font-size: 19px; font-variant-numeric: tabular-nums; }
+    .city .when { font-size: 12px; color: var(--muted); }
+    .city.top { border-color: rgba(244,185,66,.7); background: linear-gradient(160deg, #2e2214, var(--ink-2)); }
+    .city.top .hz { color: rgba(244,185,66,.2); }
+    .nodata { font-size: 13px; color: var(--muted); line-height: 1.5; padding-inline: 4px; }
 
-    .status-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 4px; border-top: 1px solid var(--line); margin-top: 2px; }
-    .pill { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); padding-top: 12px; }
-    .pill i { width: 9px; height: 9px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 4px rgba(244,185,66,.18); }
-    .pill.ok { color: var(--jade); }
-    .pill.ok i { background: var(--jade); box-shadow: 0 0 0 4px rgba(67,198,165,.2); }
-    .ghost { margin-top: 12px; background: none; border: 1px solid var(--line); color: var(--paper); border-radius: 12px; padding: 9px 14px; font: inherit; font-size: 14px; cursor: pointer; transition: border-color .2s, background .2s; }
-    .ghost:hover { border-color: var(--gold); background: rgba(244,185,66,.08); }
+    /* ---------- весёлый блок ---------- */
+    .fun { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    @media (min-width: 640px) { .fun { grid-template-columns: 1fr 1fr; } }
+    .hanzi { font-family: var(--brush); font-size: clamp(44px, 13vw, 60px); line-height: 1.1; color: var(--gold); overflow-wrap: anywhere; animation: pop .5s both; }
+    .pinyin { font-size: 17px; font-style: italic; color: var(--paper); }
+    .conv { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+    .conv label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
+    .conv input { width: 100%; font-size: 17px; font-variant-numeric: tabular-nums; }
+    .conv span { color: var(--muted); padding-top: 18px; }
+    .prices { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 6px; }
+    .prices li { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; padding: 6px 0; border-top: 1px solid var(--line); }
+    .prices li b { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
-    .refresh-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .refresh-row .ghost { margin-top: 0; white-space: nowrap; }
-    .refresh-row .ghost:disabled { opacity: .55; cursor: default; }
-    .fresh { font-size: 13px; color: var(--muted); line-height: 1.35; flex: 1; min-width: 160px; }
-    .fresh.stale { color: var(--red-hot); }
-    .cta.alt { background: transparent; border: 1.5px solid rgba(244,185,66,.7); color: var(--gold); box-shadow: none; }
-    .cta.alt::after { display: none; }
-    .cta.alt:hover { background: rgba(244,185,66,.1); box-shadow: none; }
-
-    /* ---------- Билеты ---------- */
-    .list-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-inline: 4px; }
-    h2 { font-family: var(--display); font-weight: 800; font-size: 20px; letter-spacing: -.01em; }
-    .chips { display: flex; gap: 8px; }
-    .chip { font: inherit; font-size: 13px; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; cursor: pointer; transition: all .2s; }
-    .chip[aria-pressed="true"] { color: var(--ink); background: var(--gold); border-color: var(--gold); font-weight: 600; }
-
-    ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
-    .ticket {
-      position: relative; display: grid; grid-template-columns: 1fr auto; align-items: stretch;
-      border-radius: 18px; background: var(--ink-2); border: 1px solid var(--line); overflow: hidden;
-      opacity: 0; animation: rise .6s calc(var(--i) * 70ms + .75s) both;
-      transition: transform .2s, border-color .2s;
-    }
-    .ticket:hover { transform: translateY(-3px); border-color: rgba(244,185,66,.5); }
-    .ticket.first { border-color: rgba(244,185,66,.7); background: linear-gradient(160deg, #2a1f2f, var(--ink-2)); }
-    .t-main { padding: 16px 16px 16px 18px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-    .t-price { font-family: var(--display); font-weight: 800; font-size: 26px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-    .t-dates { font-size: 15px; font-weight: 600; }
-    .t-sub { font-size: 13px; color: var(--muted); }
-    .t-go {
-      position: relative; display: flex; align-items: center; justify-content: center; width: 104px; padding: 0;
-      border-left: 2px dashed rgba(255,255,255,.16);
-      color: var(--ink); background: var(--gold); text-decoration: none;
-      font-family: var(--display); font-size: 12px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
-      transition: background .2s;
-    }
-    .t-go:hover { background: #ffd069; }
-    .ticket::before, .ticket::after {
-      content: ""; position: absolute; right: 96px; width: 16px; height: 16px; border-radius: 50%; background: var(--ink); z-index: 1;
-    }
-    .ticket::before { top: -9px; } .ticket::after { bottom: -9px; }
-    .flag { position: absolute; top: 12px; right: 120px; font-family: var(--display); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); border: 1px solid rgba(244,185,66,.6); border-radius: 5px; padding: 3px 6px; }
-    .empty { color: var(--muted); text-align: center; padding: 28px 0; }
-    .foot { color: var(--muted); font-size: 12px; text-align: center; line-height: 1.5; padding-inline: 8px; }
-
-    @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-    :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation: none !important; transition: none !important; }
-      .ticket { opacity: 1; }
-    }
+    /* ---------- сборы ---------- */
+    .todo-form { display: flex; gap: 8px; }
+    .todo-form input { flex: 1; }
+    .todo-form button { padding: 0 18px; border-radius: 12px; border: 0; background: var(--gold); color: var(--ink); font: inherit; font-weight: 700; font-size: 20px; cursor: pointer; }
+    .todos { list-style: none; margin: 0; padding: 0; }
+    .todos li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); animation: rise .35s both; }
+    .todos li:first-child { border-top: 0; }
+    .todos label { flex: 1; min-width: 0; overflow-wrap: anywhere; cursor: pointer; }
+    .todos li.done label { color: var(--muted); text-decoration: line-through; }
+    .todos input[type=checkbox] { width: 22px; height: 22px; accent-color: var(--jade); flex: none; padding: 0; }
+    .todos .x { background: none; border: 0; color: var(--muted); font-size: 20px; cursor: pointer; padding: 0 6px; }
+    .todos .x:hover { color: var(--red-hot); }
+    .progress { height: 6px; border-radius: 3px; background: var(--ink); overflow: hidden; }
+    .progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--jade), var(--gold)); transition: width .5s; }
   </style>
 </head>
 <body>
@@ -186,242 +102,349 @@
   <header class="hero">
     <img src="china.jpg?v=3" alt="Коллаж: Шанхай, Великая стена, фонари Чунцина, скоростной поезд">
     <div class="hero-top">
-      <div class="kanji" aria-hidden="true">北京</div>
-      <div class="stamp">Отпуск · ноябрь</div>
+      <div class="logo">Китай-<b>радар</b></div>
+      <div class="stamp" aria-hidden="true">冲！</div>
     </div>
     <div class="hero-bottom">
-      <div class="route" aria-label="Москва — Пекин">
-        <span class="iata">MOW</span>
-        <span class="track">
-          <svg class="plane" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" transform="rotate(90 12 12)"/></svg>
-        </span>
-        <span class="iata">PEK</span>
+      <div class="route">
+        <span class="iata" id="fromCode">MOW·KRR</span>
+        <span class="track"><svg class="plane" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" transform="rotate(90 12 12)"/></svg></span>
+        <span class="iata cn" aria-label="Китай">中国</span>
       </div>
-      <div class="count">
-        <b id="days">…</b>
-        <span id="daysLabel">дней до вылета<em id="tripDate"></em></span>
-      </div>
+      <div class="count"><b id="days">…</b><span id="daysLabel">дней до вылета<em id="tripDate"></em></span></div>
     </div>
   </header>
 
-  <section class="best" aria-live="polite">
-    <div class="eyebrow">Лучшая цена сейчас</div>
-    <div class="big" id="price">…</div>
-    <div class="meta" id="bestMeta"></div>
-    <a class="cta" id="bestLink" href="#" target="_blank" rel="noopener" hidden>Смотреть билет →</a>
-    <div class="status-row">
-      <div class="pill" id="status"><i></i><span>Билет не куплен</span></div>
-      <button class="ghost" id="toggle" type="button">Отметить: куплен</button>
+  <div class="segment" role="group" aria-label="Откуда летим" id="originSwitch">
+    <button type="button" data-o="all" aria-pressed="true">Оба города</button>
+    <button type="button" data-o="MOW" aria-pressed="false">Москва</button>
+    <button type="button" data-o="KRR" aria-pressed="false">Краснодар</button>
+  </div>
+
+  <section class="card plan" aria-live="polite">
+    <div class="plan-top">
+      <div class="eyebrow" id="planTitle">Наши даты</div>
+      <div class="trend" id="planTrend"></div>
+    </div>
+    <div class="big" id="planPrice">…</div>
+    <div class="route-line" id="planRoute"></div>
+    <div class="meta" id="planMeta"></div>
+    <a class="cta" id="planLink" href="#" target="_blank" rel="noopener" hidden>Смотреть билет →</a>
+    <ul class="mini" id="planMore"></ul>
+    <div class="spark-wrap">
+      <svg class="spark" id="planSpark" aria-hidden="true" hidden></svg>
+      <div class="meta small" id="sparkNote"></div>
+    </div>
+  </section>
+
+  <section class="card wild" style="animation-delay:.1s">
+    <div class="eyebrow" style="color:var(--red-hot)">🔥 Самый дешёвый билет в Китай</div>
+    <div class="meta small">Любой город, любые даты ноября и декабря</div>
+    <div class="big" id="wildPrice" style="font-size:clamp(32px,10vw,46px)">…</div>
+    <div class="route-line" id="wildRoute"></div>
+    <div class="meta" id="wildMeta"></div>
+    <div class="row-btns">
+      <a class="cta alt" id="wildLink" href="#" target="_blank" rel="noopener" hidden>Открыть билет</a>
+      <a class="cta alt" href="search.html">📅 Календарь цен</a>
+    </div>
+  </section>
+
+  <section id="cities">
+    <div class="section-head">
+      <h2>Куда дешевле всего</h2>
+      <p>Минимальная цена туда-обратно в ноябре и декабре. Нажмите на город, чтобы увидеть все даты.</p>
+    </div>
+    <div class="cities" id="cityGrid" style="margin-top:14px"></div>
+    <button class="ghost" id="allCities" type="button" hidden style="display:block;margin:14px auto 0">Показать все города</button>
+    <p class="nodata" id="noData" style="margin-top:12px"></p>
+  </section>
+
+  <section class="card" style="animation-delay:.15s">
+    <div class="refresh-row">
+      <div class="pill" id="status"><i></i><span>Билет ещё не куплен</span></div>
+      <button class="ghost" id="toggle" type="button">Отметить: куплен 🎉</button>
     </div>
     <div class="refresh-row">
-      <button class="ghost" id="refresh" type="button">🔄 Обновить данные</button>
+      <button class="ghost" id="refresh" type="button">🔄 Обновить цены</button>
       <div class="fresh" id="fresh" role="status"></div>
     </div>
-    <a class="cta alt" href="search.html">📅 Весь ноябрь и декабрь: искать дешёвые даты →</a>
   </section>
 
-  <section>
-    <div class="list-head">
-      <h2>Все билеты</h2>
-      <div class="chips" role="group" aria-label="Фильтр">
-        <button class="chip" id="chipAll" type="button" aria-pressed="true">Все</button>
-        <button class="chip" id="chipDirect" type="button" aria-pressed="false">Без пересадок</button>
+  <div class="fun">
+    <section class="card">
+      <div class="eyebrow">Фраза дня</div>
+      <div class="hanzi" id="hanzi">你好</div>
+      <div class="pinyin" id="pinyin">nǐ hǎo</div>
+      <div class="meta" id="phraseRu">Привет</div>
+      <div class="row-btns">
+        <button class="ghost" id="say" type="button" hidden>🔊 Послушать</button>
+        <button class="ghost" id="nextPhrase" type="button">Ещё фраза →</button>
       </div>
+    </section>
+
+    <section class="card">
+      <div class="eyebrow">Юань сегодня</div>
+      <div class="route-line" id="rate">Курс появится после обновления</div>
+      <div class="conv">
+        <label>Рубли<input id="rub" type="number" inputmode="decimal" value="10000"></label>
+        <span>⇄</span>
+        <label>Юани<input id="cny" type="number" inputmode="decimal"></label>
+      </div>
+      <ul class="prices" id="cnyPrices"></ul>
+    </section>
+  </div>
+
+  <section class="card" style="animation-delay:.2s">
+    <div class="plan-top">
+      <h2>Сборы на двоих</h2>
+      <span class="meta small" id="todoCount"></span>
     </div>
-    <ul id="offers" style="margin-top:14px"></ul>
-    <div class="empty" id="empty" hidden></div>
+    <div class="progress"><i id="todoBar"></i></div>
+    <form class="todo-form" id="todoForm">
+      <input id="todoText" type="text" maxlength="120" placeholder="Что не забыть или что хотим увидеть" autocomplete="off" aria-label="Новый пункт">
+      <button type="submit" aria-label="Добавить">+</button>
+    </form>
+    <div class="chips" id="todoIdeas"></div>
+    <ul class="todos" id="todos"></ul>
+    <div class="meta small" id="todoNote"></div>
   </section>
 
-  <p class="foot">Цены от Aviasales, от дешёвых к дорогим. Перед покупкой они могут измениться. Обновляются автоматически каждые 4 часа.</p>
+  <p class="foot">Цены из кэша Aviasales: перед покупкой они могут измениться. Обновляются сами раз в 4 часа или по кнопке.<br>
+    Бот в Telegram: /top, /update, /bought, /phrase. Позовите друга: пусть напишет боту /start.</p>
 </main>
 
+<script src="common.js?v=5"></script>
 <script>
-  const URL_ = "https://exmxqybejhbtnbtqcwms.supabase.co";
-  const KEY = "sb_publishable_H_c3d5terU1y4slV6t-ChQ_bnfECYM2";
-  const H = { apikey: KEY, "Content-Type": "application/json" };
-  const $ = (id) => document.getElementById(id);
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-
+  const { $, el, rub } = T;
+  let D = null;
+  let origin = T.store.get("origin", "all");
+  let phrases = [];
+  let phraseIdx = 0;
   let bought = false;
-  let offers = [];
-  let directOnly = false;
+  let showAllCities = false;
 
-  const rub = (n) => n.toLocaleString("ru-RU") + " ₽";
-  const dm = (iso) => new Date(iso + "T00:00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
-  const short = (iso) => new Date(iso + "T00:00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "short" }).replace(".", "");
-  const stops = (n) => (n == null ? "" : n === 0 ? "без пересадок" : n + " " + (n === 1 ? "пересадка" : "пересадки"));
-  const plural = (n, a, b, c) => { const m = n % 100, k = n % 10; return m > 10 && m < 20 ? c : k === 1 ? a : k > 1 && k < 5 ? b : c; };
+  const fresh = T.freshness($("fresh"));
+  const requestRefresh = T.refresher($("refresh"), fresh, (d) => render(d));
 
-  // ссылка на билет: из API, а если её нет, то поиск на Aviasales по тем же датам
-  function link(o) {
-    if (o.link) return o.link;
-    const ddmm = (iso) => iso.slice(8, 10) + iso.slice(5, 7);
-    return "https://www.aviasales.ru/search/MOW" + ddmm(o.dep) + "PEK" + ddmm(o.ret) + "1";
+  const cityOf = (x) => (D.cities.find((c) => c.code === x) || { name: x, hanzi: "", vibe: "" });
+  const originOf = (o) => (D.origins.find((c) => c.code === o) || { name: o, from: o });
+  const routeName = (i) => originOf(i.o).name + " → " + cityOf(i.x).name;
+  const byOrigin = (list) => (origin === "all" ? list : list.filter((i) => i.o === origin));
+  const datesText = (i) => T.short(i.d) + " → " + T.short(i.r) + " · " + T.nights(i) + " дн.";
+
+  /* ---------- откуда летим ---------- */
+  function setOrigin(o) {
+    origin = o;
+    T.store.set("origin", o);
+    document.querySelectorAll("#originSwitch button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.o === o)));
+    $("fromCode").textContent = o === "all" ? "MOW·KRR" : o;
+    if (D) { renderPlan(); renderWild(); renderCities(); }
+  }
+  document.querySelectorAll("#originSwitch button").forEach((b) => b.addEventListener("click", () => setOrigin(b.dataset.o)));
+
+  /* ---------- отрисовка ---------- */
+  function render(d) {
+    D = d;
+    fresh.set(d.updated_at);
+    const left = Math.max(Math.ceil((T.dt(d.trip_start) - new Date()) / 864e5), 0);
+    T.countUp($("days"), left, String);
+    $("daysLabel").firstChild.textContent = T.plural(left, "день", "дня", "дней") + " до вылета";
+    $("tripDate").textContent = T.dm(d.trip_start);
+    renderPlan(); renderWild(); renderCities(); renderYuan();
   }
 
-  function countUp(el, to, fmt) {
-    if (reduce || to < 1) { el.textContent = fmt(to); return; }
-    const t0 = performance.now(), dur = 1100;
-    const step = (t) => {
-      const p = Math.min((t - t0) / dur, 1), e = 1 - Math.pow(1 - p, 3);
-      el.textContent = fmt(Math.round(to * e));
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
+  function renderPlan() {
+    const pw = D.plan_window;
+    $("planTitle").textContent = "🎯 Наши даты · " + T.dt(pw.depart_from).getDate() + "–" + T.dm(pw.depart_to) + " → " + T.dt(pw.return_from).getDate() + "–" + T.dm(pw.return_to);
+    const list = byOrigin(D.plan || []);
+    const more = $("planMore");
+    more.textContent = "";
+    if (!list.length) {
+      $("planPrice").textContent = "Пока нет";
+      $("planRoute").textContent = "";
+      $("planMeta").textContent = origin === "KRR" ? "Из Краснодара на наши даты вариантов пока не нашлось. Попробуйте «Оба города»." : "На эти даты цен пока не нашлось. Загляните в календарь: там все даты ноября и декабря.";
+      $("planLink").hidden = true;
+    } else {
+      const b = list[0];
+      T.countUp($("planPrice"), b.p, rub);
+      $("planRoute").textContent = routeName(b);
+      $("planMeta").textContent = [T.dm(b.d) + " → " + T.dm(b.r), T.nights(b) + " дн.", b.a, T.stops(b.t)].filter(Boolean).join(" · ");
+      $("planLink").href = T.url(b);
+      $("planLink").hidden = false;
+      list.slice(1, 5).forEach((i) => {
+        const a = el("a"); a.href = T.url(i); a.target = "_blank"; a.rel = "noopener";
+        a.append(el("span", "r", routeName(i)), el("span", "p", rub(i.p)), el("span", "s", datesText(i) + (i.t != null ? " · " + T.stops(i.t) : "")));
+        const li = el("li"); li.appendChild(a); more.appendChild(li);
+      });
+    }
+    const tr = D.trend && D.trend.plan_24h;
+    const t = $("planTrend");
+    t.className = "trend " + (tr < 0 ? "down" : tr > 0 ? "up" : "flat");
+    t.textContent = tr == null ? "" : tr === 0 ? "➖ за сутки без изменений" : (tr < 0 ? "📉 −" : "📈 +") + rub(Math.abs(tr)) + " за сутки";
+    const s = T.spark($("planSpark"), (D.spark || []).map((p) => p.plan));
+    $("sparkNote").textContent = s ? "Лучшая цена на наши даты за последние проверки: от " + rub(s.lo) + " до " + rub(s.hi) : "График появится после нескольких обновлений. По нему видно, когда цены падают.";
   }
 
-  function renderStatus() {
-    $("status").className = "pill" + (bought ? " ok" : "");
-    $("status").lastElementChild.textContent = bought ? "Билет куплен" : "Билет не куплен";
-    $("toggle").textContent = bought ? "Снять отметку" : "Отметить: куплен";
+  function renderWild() {
+    const b = byOrigin(D.board || [])[0];
+    if (!b) {
+      $("wildPrice").textContent = "Пока нет";
+      $("wildRoute").textContent = ""; $("wildMeta").textContent = "Цен для этого города вылета не нашлось."; $("wildLink").hidden = true;
+      return;
+    }
+    T.countUp($("wildPrice"), b.p, rub);
+    $("wildRoute").textContent = routeName(b);
+    $("wildMeta").textContent = [T.dm(b.d) + " → " + T.dm(b.r), T.nights(b) + " дн.", T.stops(b.t)].filter(Boolean).join(" · ");
+    $("wildLink").href = T.url(b);
+    $("wildLink").hidden = false;
   }
 
-  function renderList() {
-    const ul = $("offers");
+  function renderCities() {
+    const grid = $("cityGrid");
+    grid.textContent = "";
+    const best = {};
+    byOrigin(D.board || []).forEach((i) => { if (!best[i.x] || i.p < best[i.x].p) best[i.x] = i; });
+    const ranked = Object.values(best).sort((a, b) => a.p - b.p);
+    const btn = $("allCities");
+    btn.hidden = ranked.length <= 8;
+    btn.textContent = showAllCities ? "Свернуть" : "Показать все города (" + ranked.length + ")";
+    ranked.slice(0, showAllCities ? ranked.length : 8).forEach((i, n) => {
+      const c = cityOf(i.x);
+      const a = el("a", "city" + (n === 0 ? " top" : ""));
+      a.href = "search.html?city=" + i.x + (origin !== "all" ? "&from=" + origin : "");
+      a.style.setProperty("--i", n);
+      a.append(el("span", "hz", c.hanzi), el("span", "rank", n === 0 ? "🏆 дешевле всех" : "#" + (n + 1)),
+        el("span", "name", c.name), el("span", "vibe", c.vibe), el("span", "price", "от " + rub(i.p)),
+        el("span", "when", T.short(i.d) + " → " + T.short(i.r) + " · " + originOf(i.o).from));
+      grid.appendChild(a);
+    });
+    const missing = D.cities.filter((c) => !best[c.code]).map((c) => c.name);
+    $("noData").textContent = missing.length ? "Без цен сейчас: " + missing.join(", ") + "." : "";
+  }
+
+  $("allCities").addEventListener("click", () => { showAllCities = !showAllCities; renderCities(); });
+
+  /* ---------- юань ---------- */
+  const SPEND = [["🍜", "Миска лапши", 25], ["🧋", "Бабл-ти", 18], ["☕", "Кофе", 30], ["🍺", "Пиво в баре", 25], ["🚇", "Поездка в метро", 4], ["🦆", "Пекинская утка", 260], ["🏯", "Билет в Запретный город", 60], ["🚄", "Скоростной поезд Пекин–Шанхай", 670]];
+  function renderYuan() {
+    const r = D.cny;
+    if (!r) return;
+    $("rate").textContent = "1 ¥ = " + r.toLocaleString("ru-RU", { maximumFractionDigits: 2 }) + " ₽";
+    const ul = $("cnyPrices");
     ul.textContent = "";
-    const list = offers.filter((o) => !directOnly || (o.transfers === 0 && !o.return_transfers));
-    $("empty").hidden = list.length > 0;
-    $("empty").textContent = offers.length ? "Билетов без пересадок не нашлось." : "Цены пока не найдены. Зайдите позже.";
-    list.forEach((o, i) => {
-      const li = document.createElement("li");
-      li.className = "ticket" + (i === 0 ? " first" : "");
-      li.style.setProperty("--i", i);
-
-      const main = document.createElement("div");
-      main.className = "t-main";
-      const price = document.createElement("div");
-      price.className = "t-price"; price.textContent = rub(o.price);
-      const dates = document.createElement("div");
-      dates.className = "t-dates"; dates.textContent = short(o.dep) + " → " + short(o.ret);
-      const sub = document.createElement("div");
-      sub.className = "t-sub";
-      sub.textContent = [o.airline, stops(o.transfers)].filter(Boolean).join(" · ") || "Туда-обратно";
-      main.append(price, dates, sub);
-
-      const go = document.createElement("a");
-      go.className = "t-go"; go.href = link(o); go.target = "_blank"; go.rel = "noopener";
-      go.textContent = "Выбрать";
-      go.setAttribute("aria-label", "Выбрать билет за " + rub(o.price));
-
-      li.append(main, go);
-      if (i === 0) {
-        const f = document.createElement("div");
-        f.className = "flag"; f.textContent = "Дешевле всех";
-        li.appendChild(f);
-      }
+    SPEND.forEach(([e, name, y]) => {
+      const li = el("li");
+      li.append(el("span", null, e + " " + name), el("b", null, y + " ¥ ≈ " + rub(y * r)));
       ul.appendChild(li);
     });
+    syncCny("rub");
   }
-
-  function setDirect(v) {
-    directOnly = v;
-    $("chipAll").setAttribute("aria-pressed", String(!v));
-    $("chipDirect").setAttribute("aria-pressed", String(v));
-    renderList();
+  function syncCny(from) {
+    const r = D && D.cny;
+    if (!r) return;
+    if (from === "rub") { const v = parseFloat($("rub").value); $("cny").value = Number.isFinite(v) ? Math.round(v / r) : ""; }
+    else { const v = parseFloat($("cny").value); $("rub").value = Number.isFinite(v) ? Math.round(v * r) : ""; }
   }
-  $("chipAll").addEventListener("click", () => setDirect(false));
-  $("chipDirect").addEventListener("click", () => setDirect(true));
+  $("rub").addEventListener("input", () => syncCny("rub"));
+  $("cny").addEventListener("input", () => syncCny("cny"));
 
-  let knownUpdated = null;
-  let freshIso = null;
-  let refreshing = false;
-  let pollTimer = null;
-
-  const ago = (ms) => {
-    const m = Math.round(ms / 60000);
-    if (m < 1) return "только что";
-    if (m < 60) return m + " мин назад";
-    const h = Math.floor(m / 60);
-    return h < 48 ? h + " ч назад" : Math.floor(h / 24) + " дн назад";
-  };
-
-  function paintFresh() {
-    if (refreshing) return;
-    const el = $("fresh");
-    if (!freshIso) { el.textContent = "Данные ещё не обновлялись"; return; }
-    const dt = new Date(freshIso), age = Date.now() - dt;
-    el.textContent = "Данные от " + dt.toLocaleString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) + " · " + ago(age);
-    el.classList.toggle("stale", age > 6 * 3600e3);
+  /* ---------- фраза дня ---------- */
+  function showPhrase() {
+    if (!phrases.length) return;
+    const p = phrases[phraseIdx % phrases.length];
+    const h = $("hanzi");
+    h.textContent = p.h;
+    h.style.animation = "none"; void h.offsetWidth; h.style.animation = "";
+    $("pinyin").textContent = p.p;
+    $("phraseRu").textContent = p.ru;
   }
-  setInterval(paintFresh, 60000);
-
-  function load() {
-    return fetch("data.json?" + Date.now()).then((r) => r.json()).then((d) => {
-      knownUpdated = d.updated_at || null;
-      offers = (d.offers || (d.best ? [d.best] : [])).slice().sort((a, b) => a.price - b.price);
-
-      const left = Math.max(Math.ceil((new Date(d.trip_start + "T00:00:00") - new Date()) / 864e5), 0);
-      countUp($("days"), left, String);
-      $("daysLabel").firstChild.textContent = plural(left, "день", "дня", "дней") + " до вылета";
-      $("tripDate").textContent = dm(d.trip_start);
-
-      if (offers.length) {
-        const b = offers[0];
-        countUp($("price"), b.price, (n) => rub(n));
-        $("bestMeta").innerHTML = "Вылет <b></b>, возврат <b></b>";
-        const bs = $("bestMeta").querySelectorAll("b");
-        bs[0].textContent = dm(b.dep); bs[1].textContent = dm(b.ret);
-        $("bestLink").href = link(b);
-        $("bestLink").hidden = false;
-      } else {
-        $("price").textContent = "Цены ищутся";
-        $("bestMeta").textContent = "Первые цены появятся после ближайшего обновления.";
-      }
-      freshIso = d.updated_at || null;
-      paintFresh();
-      renderList();
-    }).catch(() => {
-      $("price").textContent = "Нет данных";
-      $("bestMeta").textContent = "Не удалось загрузить цены. Обновите страницу.";
+  $("nextPhrase").addEventListener("click", () => { phraseIdx++; showPhrase(); });
+  if ("speechSynthesis" in window) {
+    $("say").hidden = false;
+    $("say").addEventListener("click", () => {
+      const u = new SpeechSynthesisUtterance($("hanzi").textContent);
+      u.lang = "zh-CN"; u.rate = .8;
+      const v = speechSynthesis.getVoices().find((x) => /zh/i.test(x.lang));
+      if (v) u.voice = v;
+      speechSynthesis.cancel(); speechSynthesis.speak(u);
     });
   }
 
-  function requestRefresh() {
-    if (refreshing) return;
-    refreshing = true;
-    $("refresh").disabled = true;
-    $("fresh").classList.remove("stale");
-    $("fresh").textContent = "Запрос отправлен. Обновление займёт до 10 минут, страница обновится сама.";
-    fetch(URL_ + "/rest/v1/trip_state?id=eq.1", {
-      method: "PATCH", headers: { ...H, Prefer: "return=minimal" }, body: JSON.stringify({ refresh_requested: true })
-    }).then((r) => {
-      if (!r.ok) throw new Error();
-      const t0 = Date.now();
-      clearInterval(pollTimer);
-      pollTimer = setInterval(() => {
-        fetch("data.json?" + Date.now()).then((r) => r.json()).then((d) => {
-          if (d.updated_at && d.updated_at !== knownUpdated) {
-            clearInterval(pollTimer); refreshing = false; $("refresh").disabled = false; load();
-          } else if (Date.now() - t0 > 15 * 60e3) {
-            clearInterval(pollTimer); refreshing = false; $("refresh").disabled = false;
-            $("fresh").textContent = "Обновление задерживается. Попробуйте ещё раз чуть позже.";
-          }
-        }).catch(() => {});
-      }, 20000);
-    }).catch(() => {
-      refreshing = false; $("refresh").disabled = false;
-      $("fresh").textContent = "Не удалось отправить запрос. Проверьте, что в Supabase выполнен SQL для кнопки обновления.";
+  /* ---------- билет куплен ---------- */
+  function renderStatus() {
+    $("status").className = "pill" + (bought ? " ok" : "");
+    $("status").lastElementChild.textContent = bought ? "Билет куплен! 🎉" : "Билет ещё не куплен";
+    $("toggle").textContent = bought ? "Снять отметку" : "Отметить: куплен 🎉";
+  }
+  fetch(T.SB_URL + "/rest/v1/trip_state?id=eq.1&select=ticket_bought", { headers: T.H })
+    .then((r) => r.json()).then((rows) => { bought = !!(rows[0] && rows[0].ticket_bought); renderStatus(); }).catch(() => {});
+  $("toggle").addEventListener("click", () => {
+    const next = !bought;
+    fetch(T.SB_URL + "/rest/v1/trip_state?id=eq.1", { method: "PATCH", headers: { ...T.H, Prefer: "return=minimal" }, body: JSON.stringify({ ticket_bought: next }) })
+      .then((r) => { if (r.ok) { bought = next; renderStatus(); } });
+  });
+
+  /* ---------- сборы на двоих ---------- */
+  const IDEAS = ["Загранпаспорт", "Alipay или WeChat Pay", "VPN заранее", "Страховка", "eSIM или роуминг", "Переходник для розеток", "Наличные юани", "Скачать офлайн-карты", "Увидеть панд в Чэнду", "Поесть хого", "Сфоткаться на Великой стене"];
+  let todos = [];
+  const TODO = T.SB_URL + "/rest/v1/trip_todo";
+  function todoApi(method, query, body) {
+    return fetch(TODO + (query || ""), { method, headers: { ...T.H, Prefer: "return=minimal" }, body: body ? JSON.stringify(body) : undefined })
+      .then((r) => { if (!r.ok) throw new Error(); }).then(loadTodos)
+      .catch(() => { $("todoNote").textContent = "Не удалось сохранить. Обновите страницу."; });
+  }
+  function loadTodos() {
+    return fetch(TODO + "?select=id,text,done&order=done.asc,created_at.asc", { headers: T.H })
+      .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((rows) => { todos = rows; $("todoNote").textContent = ""; renderTodos(); })
+      .catch(() => { $("todoNote").textContent = "Список заработает после SQL в Supabase (одна вставка, инструкция в чате)."; renderTodos(); });
+  }
+  function renderTodos() {
+    const ul = $("todos");
+    ul.textContent = "";
+    todos.forEach((t) => {
+      const li = el("li", t.done ? "done" : "");
+      const cb = el("input"); cb.type = "checkbox"; cb.checked = t.done; cb.id = "todo" + t.id;
+      cb.addEventListener("change", () => todoApi("PATCH", "?id=eq." + t.id, { done: cb.checked }));
+      const lb = el("label", null, t.text); lb.htmlFor = cb.id;
+      const x = el("button", "x", "×"); x.type = "button"; x.setAttribute("aria-label", "Удалить");
+      x.addEventListener("click", () => todoApi("DELETE", "?id=eq." + t.id));
+      li.append(cb, lb, x); ul.appendChild(li);
+    });
+    const done = todos.filter((t) => t.done).length;
+    $("todoCount").textContent = todos.length ? done + " из " + todos.length : "";
+    $("todoBar").style.width = todos.length ? (done / todos.length) * 100 + "%" : "0";
+    const have = new Set(todos.map((t) => t.text.toLowerCase()));
+    const ideas = $("todoIdeas");
+    ideas.textContent = "";
+    IDEAS.filter((i) => !have.has(i.toLowerCase())).slice(0, 6).forEach((i) => {
+      const b = el("button", "chip", "+ " + i); b.type = "button";
+      b.addEventListener("click", () => todoApi("POST", "", { text: i }));
+      ideas.appendChild(b);
     });
   }
-  $("refresh").addEventListener("click", requestRefresh);
+  $("todoForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = $("todoText").value.trim();
+    if (!text) return;
+    $("todoText").value = "";
+    todoApi("POST", "", { text });
+  });
 
-  load();
+  /* ---------- старт ---------- */
+  setOrigin(origin);
+  Promise.all([T.json("data.json"), T.json("phrases.json")]).then(([d, p]) => {
+    phrases = p || [];
+    phraseIdx = Math.floor(Date.now() / 864e5) + 719163;  // тот же номер дня, что у бота
+    showPhrase();
+    if (d && d.cities) render(d);
+    else { $("planPrice").textContent = "Скоро"; $("planMeta").textContent = "Первые цены по всему Китаю появятся после ближайшего обновления."; $("wildPrice").textContent = "Скоро"; fresh.set(d && d.updated_at); }
+  });
+  loadTodos();
   if (location.hash === "#refresh") {  // кнопка «Обновить» из Telegram
     history.replaceState(null, "", location.pathname + location.search);
     requestRefresh();
   }
-
-  renderStatus();
-  fetch(URL_ + "/rest/v1/trip_state?id=eq.1&select=ticket_bought", { headers: H })
-    .then((r) => r.json()).then((rows) => { bought = !!(rows[0] && rows[0].ticket_bought); renderStatus(); })
-    .catch(() => {});
-
-  $("toggle").addEventListener("click", () => {
-    const next = !bought;
-    fetch(URL_ + "/rest/v1/trip_state?id=eq.1", {
-      method: "PATCH", headers: { ...H, Prefer: "return=minimal" }, body: JSON.stringify({ ticket_bought: next })
-    }).then((r) => { if (r.ok) { bought = next; renderStatus(); } });
-  });
 </script>
 </body>
 </html>

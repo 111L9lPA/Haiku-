@@ -1,7 +1,7 @@
 name: Update trip prices
 
-# Каждые 5 минут проверяем, нужно ли обновляться: по кнопке «Обновить данные» на сайте
-# или если данным больше 4 часов. Сама проверка занимает несколько секунд.
+# Каждые 5 минут быстрая проверка (пара секунд): нажали ли «Обновить» на сайте,
+# написали ли боту, не устарели ли данные (старше 4 часов). Тяжёлая часть запускается только при необходимости.
 on:
   schedule:
     - cron: "*/5 * * * *"
@@ -22,27 +22,16 @@ env:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
-      - name: Decide whether to update
+      - name: Check what to do
         id: check
         env:
           EVENT: ${{ github.event_name }}
-        run: |
-          run=false
-          if [ "$EVENT" = "workflow_dispatch" ]; then run=true; fi
-          flag=$(curl -sS "$SB_URL/rest/v1/trip_state?id=eq.1&select=refresh_requested" -H "apikey: $SB_KEY" | jq -r '.[0].refresh_requested // false' 2>/dev/null || true)
-          if [ "$flag" = "true" ]; then run=true; fi
-          last=$(jq -r '.updated_at // empty' trip/data.json 2>/dev/null || true)
-          if [ -z "$last" ]; then
-            run=true
-          else
-            age=$(( $(date +%s) - $(date -d "$last" +%s) ))
-            if [ "$age" -ge 14100 ]; then run=true; fi
-          fi
-          echo "run=$run" >> "$GITHUB_OUTPUT"
-          echo "flag=$flag" >> "$GITHUB_OUTPUT"
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+        run: python3 trip-bot/check.py
 
       - name: Clear refresh request
         if: steps.check.outputs.flag == 'true'
@@ -52,29 +41,30 @@ jobs:
             -d '{"refresh_requested":false}'
 
       - uses: actions/setup-python@v5
-        if: steps.check.outputs.run == 'true'
+        if: steps.check.outputs.prices == 'true' || steps.check.outputs.bot == 'true'
         with:
           python-version: "3.12"
 
       - name: Install
-        if: steps.check.outputs.run == 'true'
+        if: steps.check.outputs.prices == 'true' || steps.check.outputs.bot == 'true'
         run: pip install requests
 
       - name: Fetch prices
-        if: steps.check.outputs.run == 'true'
+        if: steps.check.outputs.prices == 'true'
         env:
           TP_TOKEN: ${{ secrets.TP_TOKEN }}
         run: python trip-bot/update_data.py
 
-      - name: Update Telegram message
-        if: steps.check.outputs.run == 'true'
+      - name: Telegram
+        if: steps.check.outputs.prices == 'true' || steps.check.outputs.bot == 'true'
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          PRICES_UPDATED: ${{ steps.check.outputs.prices }}
         run: python trip-bot/telegram_update.py
 
       - name: Commit data
-        if: steps.check.outputs.run == 'true'
+        if: steps.check.outputs.prices == 'true' || steps.check.outputs.bot == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

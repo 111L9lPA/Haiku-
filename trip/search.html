@@ -4,155 +4,105 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0d0a12">
-  <title>Билеты на ноябрь и декабрь</title>
+  <title>Календарь цен в Китай</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Golos+Text:wght@400;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Golos+Text:wght@400;600&family=Ma+Shan+Zheng&display=swap">
+  <link rel="stylesheet" href="common.css?v=5">
   <style>
-    /* Layout: шапка со сводкой и графиком падения цен, фильтры, тепловой календарь
-       по дням вылета, затем список билетов-талонов. Тот же ночной Пекин, что на главной. */
-    :root {
-      --ink: #0d0a12; --ink-2: #17121f; --ink-3: #231b2f; --paper: #f6efe4; --muted: #a99db8;
-      --red: #e0372f; --red-hot: #ff5a4a; --gold: #f4b942; --jade: #43c6a5; --line: rgba(255,255,255,.11);
-      --display: "Unbounded", "Arial Black", system-ui, sans-serif;
-      --body: "Golos Text", system-ui, sans-serif;
-      color-scheme: dark;
-    }
-    * { box-sizing: border-box; }
-    html { background: var(--ink); }
-    body {
-      margin: 0; padding-inline: 16px; padding-block: 20px 56px;
-      font-family: var(--body); color: var(--paper); -webkit-font-smoothing: antialiased;
-      background:
-        radial-gradient(900px 480px at 50% -10%, rgba(224,55,47,.2), transparent 70%),
-        repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 1px, transparent 1px 28px), var(--ink);
-    }
-    main { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
-    h1, h2, p { margin: 0; }
+    body { padding-block: 20px 56px; }
     .back { color: var(--gold); text-decoration: none; font-size: 14px; }
     .back:hover { text-decoration: underline; }
-    h1 { font-family: var(--display); font-weight: 800; font-size: clamp(24px, 7vw, 34px); letter-spacing: -.02em; line-height: 1.1; margin-top: 10px; animation: rise .7s both; }
-    .sub { color: var(--muted); font-size: 15px; line-height: 1.45; margin-top: 8px; animation: rise .7s .08s both; }
-    h2 { font-family: var(--display); font-weight: 800; font-size: 17px; letter-spacing: -.01em; }
-    .eyebrow { font-family: var(--display); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
+    h1 { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 8vw, 36px); letter-spacing: -.02em; line-height: 1.1; margin-top: 10px; text-wrap: balance; animation: rise .7s both; }
+    h1 .cn { font-family: var(--brush); font-weight: 400; color: var(--gold); }
+    .sub { color: var(--muted); font-size: 15px; line-height: 1.45; margin-top: 8px; }
+    header .refresh-row { margin-top: 14px; }
 
-    .card { border-radius: 22px; padding: 20px; background: linear-gradient(160deg, var(--ink-3), var(--ink-2)); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 14px; animation: rise .7s .15s both; }
-    .big { font-family: var(--display); font-weight: 800; font-size: clamp(36px, 11vw, 52px); letter-spacing: -.02em; line-height: 1; font-variant-numeric: tabular-nums; }
-    .meta { color: var(--muted); font-size: 15px; line-height: 1.45; }
-    .meta b { color: var(--paper); font-weight: 600; }
-    .trend { font-size: 14px; font-weight: 600; }
-    .trend.down { color: var(--jade); } .trend.up { color: var(--red-hot); }
-
-    .cta { display: inline-flex; align-items: center; justify-content: center; padding: 15px 20px; border-radius: 14px; border: 0; cursor: pointer; text-decoration: none; font-family: var(--display); font-weight: 500; font-size: 14px; color: #fff; background: linear-gradient(135deg, var(--red-hot), var(--red)); box-shadow: 0 10px 26px -8px rgba(224,55,47,.7); transition: transform .18s; }
-    .cta:hover { transform: translateY(-2px); }
-    .cta[hidden] { display: none; }
-    .ghost { background: none; border: 1px solid var(--line); color: var(--paper); border-radius: 12px; padding: 9px 14px; font: inherit; font-size: 14px; cursor: pointer; transition: border-color .2s, background .2s; white-space: nowrap; }
-    .ghost:hover { border-color: var(--gold); background: rgba(244,185,66,.08); }
-    .ghost:disabled { opacity: .55; cursor: default; }
-    .refresh-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
-    .fresh { font-size: 13px; color: var(--muted); line-height: 1.35; flex: 1; min-width: 160px; }
-    .fresh.stale { color: var(--red-hot); }
-
-    /* график */
-    .spark { width: 100%; height: 90px; display: block; }
-    .spark .line { fill: none; stroke: var(--gold); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
-    .spark .area { fill: url(#sg); }
-    .spark .dot { fill: var(--gold); }
-    .spark .grid { stroke: var(--line); stroke-dasharray: 3 4; }
-    .spark-note { font-size: 13px; color: var(--muted); line-height: 1.4; }
-
-    /* фильтры */
-    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .label { font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; width: 100%; }
-    .chip { font: inherit; font-size: 14px; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 9px 15px; cursor: pointer; transition: all .2s; }
-    .chip[aria-pressed="true"] { color: var(--ink); background: var(--gold); border-color: var(--gold); font-weight: 600; }
-    .num, select { font: inherit; font-size: 15px; color: var(--paper); background: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; }
-    .num { width: 74px; text-align: center; }
-    select { max-width: 100%; }
+    .filters { gap: 16px; }
+    .group { display: flex; flex-direction: column; gap: 8px; }
+    .label { font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
     .field { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; }
+    .num { width: 74px; text-align: center; }
 
-    /* календарь */
     .month-title { font-family: var(--display); font-size: 14px; text-transform: capitalize; }
-    .grid7 { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
-    .dow { font-size: 11px; color: var(--muted); text-align: center; padding-bottom: 2px; }
-    .day { position: relative; aspect-ratio: 1 / 1.05; border-radius: 10px; border: 1.5px solid transparent; padding: 0; font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
-      background: color-mix(in srgb, var(--gold) calc((1 - var(--t, 1)) * 88%), var(--ink-3)); color: var(--paper); transition: transform .15s; }
+    .grid7 { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; margin-top: 8px; }
+    .dow { font-size: 11px; color: var(--muted); text-align: center; }
+    .day {
+      position: relative; aspect-ratio: 1 / 1.05; border-radius: 10px; border: 1.5px solid transparent; padding: 0; font: inherit; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      background: color-mix(in srgb, var(--gold) calc((1 - var(--t, 1)) * 88%), var(--ink-3)); color: var(--paper); transition: transform .15s;
+    }
     .day.cheap { color: var(--ink); }
     .day b { font-size: 13px; font-weight: 600; line-height: 1; }
-    .day span { font-size: 10px; line-height: 1; font-variant-numeric: tabular-nums; opacity: .92; }
-    .day:hover { transform: scale(1.07); z-index: 2; }
+    .day span { font-size: 10px; line-height: 1; font-variant-numeric: tabular-nums; }
+    .day:hover { transform: scale(1.08); z-index: 2; }
     .day.sel { border-color: var(--paper); box-shadow: 0 0 0 2px var(--red-hot); }
+    .day.plan::after { content: ""; position: absolute; top: 4px; right: 4px; width: 5px; height: 5px; border-radius: 50%; background: var(--red-hot); }
     .day.none { background: transparent; color: rgba(255,255,255,.22); cursor: default; border: 1px dashed rgba(255,255,255,.08); }
     .day.none:hover { transform: none; }
     .blank { visibility: hidden; }
-    .legend { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
-    .legend i { flex: 1; height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--gold), var(--ink-3)); }
+    .legend { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+    .legend i { flex: 1; min-width: 80px; height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--gold), var(--ink-3)); }
+    .legend .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red-hot); flex: none; }
 
-    /* билеты */
     .list-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding-inline: 4px; }
-    ul { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
-    .ticket { position: relative; display: grid; grid-template-columns: 1fr auto; border-radius: 18px; background: var(--ink-2); border: 1px solid var(--line); overflow: hidden; opacity: 0; animation: rise .5s calc(min(var(--i), 10) * 55ms) both; transition: transform .2s, border-color .2s; }
-    .ticket:hover { transform: translateY(-3px); border-color: rgba(244,185,66,.5); }
-    .ticket.first { border-color: rgba(244,185,66,.7); background: linear-gradient(160deg, #2a1f2f, var(--ink-2)); }
-    .t-main { padding: 15px 14px 15px 18px; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-    .t-price { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; font-family: var(--display); font-weight: 800; font-size: 24px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-    .drop { font-family: var(--body); font-size: 13px; font-weight: 600; letter-spacing: 0; }
-    .drop.down { color: var(--jade); } .drop.up { color: var(--red-hot); }
-    .t-dates { font-size: 15px; font-weight: 600; }
-    .t-sub { font-size: 13px; color: var(--muted); }
-    .t-go { position: relative; display: flex; align-items: center; justify-content: center; width: 104px; border-left: 2px dashed rgba(255,255,255,.16); color: var(--ink); background: var(--gold); text-decoration: none; font-family: var(--display); font-size: 12px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; transition: background .2s; }
-    .t-go:hover { background: #ffd069; }
-    .ticket::before, .ticket::after { content: ""; position: absolute; right: 96px; width: 16px; height: 16px; border-radius: 50%; background: var(--ink); z-index: 1; }
-    .ticket::before { top: -9px; } .ticket::after { bottom: -9px; }
-    .empty { color: var(--muted); text-align: center; padding: 26px 8px; line-height: 1.5; }
     .more { align-self: center; margin-top: 14px; }
-    .foot { color: var(--muted); font-size: 12px; text-align: center; line-height: 1.5; }
-
-    @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-    :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .ticket { opacity: 1; } }
   </style>
 </head>
 <body>
 <main>
   <header>
-    <a class="back" href="./">← К отпуску</a>
-    <h1>Билеты на ноябрь и декабрь</h1>
-    <p class="sub">Москва → Пекин туда-обратно. Все даты вылета и возврата, чтобы поймать самую низкую цену.</p>
+    <a class="back" href="./">← Китай-радар</a>
+    <h1>Календарь цен <span class="cn">中国</span></h1>
+    <p class="sub">Все билеты туда-обратно в ноябре и декабре: из Москвы и Краснодара во все города Китая. Ищите, когда и куда дешевле.</p>
     <div class="refresh-row">
-      <button class="ghost" id="refresh" type="button">🔄 Обновить данные</button>
+      <button class="ghost" id="refresh" type="button">🔄 Обновить цены</button>
       <div class="fresh" id="fresh" role="status"></div>
     </div>
   </header>
 
   <section class="card" aria-live="polite">
-    <div class="eyebrow">Самая низкая цена сейчас</div>
-    <div class="big" id="min">…</div>
-    <div class="meta" id="minMeta"></div>
+    <div class="eyebrow" id="bestTitle">Лучшее по фильтрам</div>
+    <div class="big" id="bestPrice">…</div>
+    <div class="route-line" id="bestRoute"></div>
+    <div class="meta" id="bestMeta"></div>
     <div class="trend" id="trend"></div>
-    <a class="cta" id="minLink" href="#" target="_blank" rel="noopener" hidden>Смотреть билет →</a>
-    <svg class="spark" id="spark" viewBox="0 0 320 90" preserveAspectRatio="none" aria-hidden="true" hidden>
-      <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4b942" stop-opacity=".35"/><stop offset="1" stop-color="#f4b942" stop-opacity="0"/></linearGradient></defs>
-      <line class="grid" x1="0" y1="20" x2="320" y2="20"/><line class="grid" x1="0" y1="70" x2="320" y2="70"/>
-      <path class="area" id="sparkArea" d=""/><path class="line" id="sparkLine" d=""/><circle class="dot" id="sparkDot" r="4" cx="0" cy="0"/>
-    </svg>
-    <div class="spark-note" id="sparkNote"></div>
+    <a class="cta" id="bestLink" href="#" target="_blank" rel="noopener" hidden>Смотреть билет →</a>
+    <svg class="spark" id="spark" aria-hidden="true" hidden></svg>
+    <div class="meta small" id="sparkNote"></div>
   </section>
 
-  <section class="card">
-    <div class="row">
-      <div class="label">Месяц вылета</div>
-      <button class="chip" data-month="all" aria-pressed="true">Весь период</button>
-      <button class="chip" data-month="2026-11" aria-pressed="false">Ноябрь</button>
-      <button class="chip" data-month="2026-12" aria-pressed="false">Декабрь</button>
+  <section class="card filters">
+    <div class="group">
+      <div class="label">Откуда</div>
+      <div class="segment" id="fromSeg" role="group" aria-label="Откуда">
+        <button type="button" data-o="all" aria-pressed="true">Оба</button>
+        <button type="button" data-o="MOW" aria-pressed="false">Москва</button>
+        <button type="button" data-o="KRR" aria-pressed="false">Краснодар</button>
+      </div>
     </div>
-    <div class="row">
+    <div class="group">
+      <div class="label">Куда</div>
+      <div class="chips scroll" id="cityChips"></div>
+    </div>
+    <div class="group">
+      <div class="label">Когда</div>
+      <div class="chips" id="monthChips">
+        <button class="chip" type="button" data-month="all" aria-pressed="true">Ноябрь и декабрь</button>
+        <button class="chip" type="button" data-month="2026-11" aria-pressed="false">Ноябрь</button>
+        <button class="chip" type="button" data-month="2026-12" aria-pressed="false">Декабрь</button>
+        <button class="chip" type="button" id="planChip" aria-pressed="false">🎯 Наши даты</button>
+      </div>
+    </div>
+    <div class="group">
       <div class="label">Поездка</div>
-      <button class="chip" id="direct" aria-pressed="false">Без пересадок</button>
-      <label class="field">от <input class="num" id="minDays" type="number" min="1" max="60" value="1" inputmode="numeric"></label>
-      <label class="field">до <input class="num" id="maxDays" type="number" min="1" max="60" value="60" inputmode="numeric"> дн.</label>
+      <div class="chips" style="align-items:center">
+        <button class="chip" type="button" id="direct" aria-pressed="false">Без пересадок</button>
+        <label class="field">от <input class="num" id="minDays" type="number" min="1" max="60" value="3" inputmode="numeric"></label>
+        <label class="field">до <input class="num" id="maxDays" type="number" min="1" max="60" value="30" inputmode="numeric"> дн.</label>
+      </div>
     </div>
-    <div class="row">
+    <div class="group">
       <div class="label">Сортировка</div>
       <select id="sort" aria-label="Сортировка">
         <option value="price">Сначала дешёвые</option>
@@ -164,9 +114,9 @@
 
   <section class="card">
     <h2>Цены по дням вылета</h2>
-    <div class="meta" style="font-size:14px">Показана самая дешёвая цена на каждый день. Нажмите на день, чтобы увидеть билеты на эту дату.</div>
+    <div class="meta small">Самая дешёвая цена на каждый день по выбранным фильтрам. Нажмите на день, чтобы увидеть билеты на эту дату.</div>
     <div id="cal" style="display:flex;flex-direction:column;gap:18px"></div>
-    <div class="legend"><span>дешевле</span><i></i><span>дороже</span></div>
+    <div class="legend"><span>дешевле</span><i></i><span>дороже</span><span class="dot"></span><span>наши даты</span></div>
   </section>
 
   <section>
@@ -174,245 +124,211 @@
       <h2 id="resTitle">Билеты</h2>
       <button class="ghost" id="clearDay" type="button" hidden>Сбросить день</button>
     </div>
-    <ul id="list"></ul>
-    <button class="ghost more" id="more" type="button" hidden>Показать ещё</button>
+    <ul class="tickets" id="list" style="margin-top:14px"></ul>
+    <button class="ghost more" id="more" type="button" hidden style="display:block;margin-inline:auto">Показать ещё</button>
     <div class="empty" id="empty" hidden></div>
   </section>
 
-  <p class="foot">Цены от Aviasales и могут измениться при покупке. Данные обновляются автоматически не реже чем раз в 4 часа.</p>
+  <p class="foot">Цены из кэша Aviasales и могут измениться при покупке. Обновляются сами раз в 4 часа или по кнопке.</p>
 </main>
 
+<script src="common.js?v=5"></script>
 <script>
-  const URL_ = "https://exmxqybejhbtnbtqcwms.supabase.co";
-  const KEY = "sb_publishable_H_c3d5terU1y4slV6t-ChQ_bnfECYM2";
-  const H = { apikey: KEY, "Content-Type": "application/json" };
-  const $ = (id) => document.getElementById(id);
-  const PAGE = 20;
+  const { $, el, rub } = T;
+  const PAGE = 25;
+  const q = new URLSearchParams(location.search);
+  const st = {
+    from: q.get("from") || T.store.get("origin", "all"),
+    city: q.get("city") || "all",
+    month: "all", plan: q.get("plan") === "1", direct: false,
+    min: 3, max: 30, sort: "price", day: null, shown: PAGE,
+  };
+  let items = [], points = [], meta = { cities: [], origins: [], plan_window: null };
 
-  let items = [];
-  let points = [];
-  let generated = null;
-  const st = { month: "all", direct: false, min: 1, max: 60, sort: "price", day: null, shown: PAGE };
+  const fresh = T.freshness($("fresh"));
+  T.refresher($("refresh"), fresh, () => load());
 
-  const rub = (n) => n.toLocaleString("ru-RU") + " ₽";
-  const dt = (iso) => new Date(iso + "T00:00:00");
-  const dm = (iso) => dt(iso).toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
-  const short = (iso) => dt(iso).toLocaleDateString("ru-RU", { day: "numeric", month: "short" }).replace(".", "");
-  const days = (i) => Math.round((dt(i.r) - dt(i.d)) / 864e5);
-  const stops = (n) => (n == null ? "" : n === 0 ? "без пересадок" : n + " " + (n === 1 ? "пересадка" : "пересадки"));
-  const isDirect = (i) => i.t === 0 && !i.rt;
-  const ddmm = (iso) => iso.slice(8, 10) + iso.slice(5, 7);
-  const link = (i) => i.l ? "https://www.aviasales.ru" + i.l : "https://www.aviasales.ru/search/MOW" + ddmm(i.d) + "PEK" + ddmm(i.r) + "1";
+  const cityOf = (x) => meta.cities.find((c) => c.code === x) || { name: x, hanzi: "" };
+  const originOf = (o) => meta.origins.find((c) => c.code === o) || { name: o, from: o };
+  const routeName = (i) => originOf(i.o).name + " → " + cityOf(i.x).name;
+  const inPlan = (i) => { const w = meta.plan_window; return w && i.d >= w.depart_from && i.d <= w.depart_to && i.r >= w.return_from && i.r <= w.return_to; };
 
   /* ---------- фильтры ---------- */
-  function filtered(ignoreDay) {
+  function filtered({ ignoreDay = false, ignoreCity = false } = {}) {
     return items.filter((i) =>
+      (st.from === "all" || i.o === st.from) &&
+      (ignoreCity || st.city === "all" || i.x === st.city) &&
       (st.month === "all" || i.d.startsWith(st.month)) &&
-      (!st.direct || isDirect(i)) &&
-      days(i) >= st.min && days(i) <= st.max &&
+      (!st.plan || inPlan(i)) &&
+      (!st.direct || T.isDirect(i)) &&
+      (st.plan || (T.nights(i) >= st.min && T.nights(i) <= st.max)) &&
       (ignoreDay || !st.day || i.d === st.day));
   }
-
+  const gain = (i) => (i.pp && i.pp > i.p ? i.pp - i.p : 0);
   function sorted(list) {
     const l = list.slice();
     if (st.sort === "date") l.sort((a, b) => a.d.localeCompare(b.d) || a.p - b.p);
-    else if (st.sort === "drop") l.sort((a, b) => ((b.pp && b.pp > b.p ? b.pp - b.p : 0) - (a.pp && a.pp > a.p ? a.pp - a.p : 0)) || a.p - b.p);
+    else if (st.sort === "drop") l.sort((a, b) => gain(b) - gain(a) || a.p - b.p);
     else l.sort((a, b) => a.p - b.p);
     return l;
   }
 
-  /* ---------- сводка и график ---------- */
-  function renderSummary() {
-    if (!items.length) {
-      $("min").textContent = "Нет цен";
-      $("minMeta").textContent = "Нажмите «Обновить данные»: цены появятся через несколько минут.";
-      return;
+  /* ---------- шапка: лучшее и график ---------- */
+  function renderBest() {
+    const list = filtered().sort((a, b) => a.p - b.p);
+    const where = st.city === "all" ? "Китай" : cityOf(st.city).name;
+    $("bestTitle").textContent = "Лучшее по фильтрам · " + where;
+    if (!list.length) {
+      $("bestPrice").textContent = "Нет билетов";
+      $("bestRoute").textContent = "";
+      $("bestMeta").textContent = items.length ? "Попробуйте другой город, месяц или длительность поездки." : "Цен пока нет. Нажмите «Обновить цены».";
+      $("bestLink").hidden = true;
+    } else {
+      const b = list[0];
+      T.countUp($("bestPrice"), b.p, rub);
+      $("bestRoute").textContent = routeName(b);
+      $("bestMeta").textContent = [T.dm(b.d) + " → " + T.dm(b.r), T.nights(b) + " дн.", b.a, T.stops(b.t)].filter(Boolean).join(" · ");
+      $("bestLink").href = T.url(b);
+      $("bestLink").hidden = false;
     }
-    const m = items[0];  // items отсортированы по цене
-    $("min").textContent = rub(m.p);
-    $("minMeta").innerHTML = "Вылет <b></b>, возврат <b></b> · " + days(m) + " дн.";
-    const b = $("minMeta").querySelectorAll("b");
-    b[0].textContent = dm(m.d); b[1].textContent = dm(m.r);
-    $("minLink").href = link(m); $("minLink").hidden = false;
-
+    const series = points.map((p) => (st.city === "all" ? p.min : (p.c || {})[st.city]));
+    const s = T.spark($("spark"), series);
     const tr = $("trend");
-    if (points.length >= 2) {
-      const prev = points[points.length - 2].min, now = points[points.length - 1].min, diff = now - prev;
-      tr.className = "trend " + (diff < 0 ? "down" : diff > 0 ? "up" : "");
-      tr.textContent = diff === 0 ? "Без изменений с прошлой проверки" : (diff < 0 ? "↓ Подешевело на " : "↑ Подорожало на ") + rub(Math.abs(diff)) + " с прошлой проверки";
-    }
-    drawSpark();
+    const vals = series.filter((v) => v != null);
+    if (vals.length >= 2) {
+      const diff = vals[vals.length - 1] - vals[vals.length - 2];
+      tr.className = "trend " + (diff < 0 ? "down" : diff > 0 ? "up" : "flat");
+      tr.textContent = diff === 0 ? "➖ без изменений с прошлой проверки" : (diff < 0 ? "📉 −" : "📈 +") + rub(Math.abs(diff)) + " с прошлой проверки";
+    } else { tr.textContent = ""; }
+    $("sparkNote").textContent = s
+      ? "Минимум " + (st.city === "all" ? "по Китаю" : "в " + cityOf(st.city).name) + " за " + vals.length + " проверок: от " + rub(s.lo) + " до " + rub(s.hi) + "."
+      : "График появится после нескольких обновлений. По нему видно, когда цены падают.";
   }
 
-  function drawSpark() {
-    const pts = points.slice(-120);
-    if (pts.length < 2) {
-      $("sparkNote").textContent = "График динамики появится после нескольких обновлений. Так видно, когда цены падают.";
-      return;
-    }
-    const vals = pts.map((p) => p.min), lo = Math.min(...vals), hi = Math.max(...vals), span = Math.max(hi - lo, 1);
-    const x = (i) => (i / (pts.length - 1)) * 316 + 2;
-    const y = (v) => 70 - ((v - lo) / span) * 50;
-    const d = pts.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.min).toFixed(1)).join(" ");
-    $("sparkLine").setAttribute("d", d);
-    $("sparkArea").setAttribute("d", d + " L318 90 L2 90 Z");
-    $("sparkDot").setAttribute("cx", x(pts.length - 1)); $("sparkDot").setAttribute("cy", y(vals[vals.length - 1]));
-    $("spark").hidden = false;
-    const best = pts.reduce((a, p) => (p.min < a.min ? p : a));
-    $("sparkNote").textContent = "Минимум за " + pts.length + " проверок: " + rub(lo) + " (" + short(best.d) + " → " + short(best.r) + "). Максимум: " + rub(hi) + ".";
+  /* ---------- чипсы городов ---------- */
+  function renderCityChips() {
+    const box = $("cityChips");
+    box.textContent = "";
+    const mins = {};
+    filtered({ ignoreDay: true, ignoreCity: true }).forEach((i) => { if (!mins[i.x] || i.p < mins[i.x]) mins[i.x] = i.p; });
+    const add = (code, label, price) => {
+      const b = el("button", "chip", label);
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(st.city === code));
+      if (price) b.appendChild(el("small", null, T.k(price)));
+      b.addEventListener("click", () => { st.city = code; st.day = null; st.shown = PAGE; renderAll(); });
+      box.appendChild(b);
+    };
+    add("all", "Все города");
+    meta.cities.filter((c) => mins[c.code]).sort((a, b) => mins[a.code] - mins[b.code]).forEach((c) => add(c.code, c.name, mins[c.code]));
+    const sel = box.querySelector('[aria-pressed="true"]');
+    if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: "nearest", inline: "center" });
   }
 
   /* ---------- календарь ---------- */
   function renderCalendar() {
     const cal = $("cal");
     cal.textContent = "";
-    const base = filtered(true);
-    const minByDay = {};
-    base.forEach((i) => { if (!minByDay[i.d] || i.p < minByDay[i.d]) minByDay[i.d] = i.p; });
+    const minByDay = {}, planDays = new Set();
+    filtered({ ignoreDay: true }).forEach((i) => {
+      if (!minByDay[i.d] || i.p < minByDay[i.d]) minByDay[i.d] = i.p;
+      if (inPlan(i)) planDays.add(i.d);
+    });
     const vals = Object.values(minByDay);
     const lo = Math.min(...vals), hi = Math.max(...vals);
-    const months = [...new Set(items.map((i) => i.d.slice(0, 7)))].sort().filter((m) => st.month === "all" || m === st.month);
-    months.forEach((ym) => {
+    ["2026-11", "2026-12"].filter((m) => st.month === "all" || m === st.month).forEach((ym) => {
       const [Y, M] = ym.split("-").map(Number);
-      const wrap = document.createElement("div");
-      const title = document.createElement("div");
-      title.className = "month-title";
-      title.textContent = new Date(Y, M - 1, 1).toLocaleDateString("ru-RU", { month: "long", year: "numeric" });
-      const grid = document.createElement("div");
-      grid.className = "grid7";
-      ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].forEach((n) => { const e = document.createElement("div"); e.className = "dow"; e.textContent = n; grid.appendChild(e); });
-      const offset = (new Date(Y, M - 1, 1).getDay() + 6) % 7;
-      for (let k = 0; k < offset; k++) { const e = document.createElement("div"); e.className = "blank"; grid.appendChild(e); }
-      const total = new Date(Y, M, 0).getDate();
-      for (let n = 1; n <= total; n++) {
+      const wrap = el("div");
+      wrap.appendChild(el("div", "month-title", new Date(Y, M - 1, 1).toLocaleDateString("ru-RU", { month: "long", year: "numeric" })));
+      const grid = el("div", "grid7");
+      ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].forEach((n) => grid.appendChild(el("div", "dow", n)));
+      for (let k = 0; k < (new Date(Y, M - 1, 1).getDay() + 6) % 7; k++) grid.appendChild(el("div", "blank"));
+      for (let n = 1; n <= new Date(Y, M, 0).getDate(); n++) {
         const iso = ym + "-" + String(n).padStart(2, "0");
         const p = minByDay[iso];
-        const b = document.createElement("button");
+        const b = el("button");
         b.type = "button";
-        const num = document.createElement("b"); num.textContent = n;
-        b.appendChild(num);
-        if (p == null) {
-          b.className = "day none"; b.disabled = true;
-        } else {
+        b.appendChild(el("b", null, n));
+        if (p == null) { b.className = "day none"; b.disabled = true; }
+        else {
           const t = hi === lo ? 0 : (p - lo) / (hi - lo);
-          b.className = "day" + (t < .5 ? " cheap" : "") + (st.day === iso ? " sel" : "");
+          b.className = "day" + (t < .5 ? " cheap" : "") + (st.day === iso ? " sel" : "") + (planDays.has(iso) ? " plan" : "");
           b.style.setProperty("--t", t.toFixed(3));
-          const s = document.createElement("span"); s.textContent = Math.round(p / 1000) + "к";
-          b.appendChild(s);
-          b.title = dm(iso) + ": от " + rub(p);
+          b.appendChild(el("span", null, T.k(p)));
+          b.title = T.dm(iso) + ": от " + rub(p);
+          b.setAttribute("aria-label", T.dm(iso) + ", от " + rub(p));
           b.addEventListener("click", () => { st.day = st.day === iso ? null : iso; st.shown = PAGE; renderAll(); });
         }
         grid.appendChild(b);
       }
-      wrap.append(title, grid);
+      wrap.appendChild(grid);
       cal.appendChild(wrap);
     });
   }
 
   /* ---------- список ---------- */
   function renderList() {
-    const list = sorted(filtered(false));
+    const list = sorted(filtered());
     const ul = $("list");
     ul.textContent = "";
     $("resTitle").textContent = "Билеты: " + list.length;
     $("clearDay").hidden = !st.day;
-    if (st.day) $("clearDay").textContent = "Сбросить " + short(st.day);
+    if (st.day) $("clearDay").textContent = "Все дни, а не " + T.short(st.day);
     $("empty").hidden = list.length > 0;
-    $("empty").textContent = items.length ? "По этим фильтрам билетов нет. Расширьте даты или уберите «Без пересадок»." : "Цен пока нет. Нажмите «Обновить данные».";
+    $("empty").textContent = items.length ? "По этим фильтрам билетов нет. Расширьте даты, смените город или уберите «Без пересадок»." : "Цен пока нет. Нажмите «Обновить цены».";
     $("more").hidden = list.length <= st.shown;
-
-    list.slice(0, st.shown).forEach((i, idx) => {
-      const li = document.createElement("li");
-      li.className = "ticket" + (idx === 0 && st.sort === "price" ? " first" : "");
-      li.style.setProperty("--i", idx);
-      const main = document.createElement("div"); main.className = "t-main";
-      const price = document.createElement("div"); price.className = "t-price";
-      price.textContent = rub(i.p);
-      if (i.pp && i.pp !== i.p) {
-        const dr = document.createElement("span");
-        dr.className = "drop " + (i.pp > i.p ? "down" : "up");
-        dr.textContent = (i.pp > i.p ? "↓ −" : "↑ +") + rub(Math.abs(i.pp - i.p));
-        price.appendChild(dr);
-      }
-      const dates = document.createElement("div"); dates.className = "t-dates";
-      dates.textContent = short(i.d) + " → " + short(i.r) + " · " + days(i) + " дн.";
-      const sub = document.createElement("div"); sub.className = "t-sub";
-      sub.textContent = [i.a, stops(i.t)].filter(Boolean).join(" · ") || "Туда-обратно";
-      main.append(price, dates, sub);
-      const go = document.createElement("a");
-      go.className = "t-go"; go.href = link(i); go.target = "_blank"; go.rel = "noopener"; go.textContent = "Выбрать";
-      go.setAttribute("aria-label", "Выбрать билет за " + rub(i.p));
+    list.slice(0, st.shown).forEach((i, n) => {
+      const li = el("li", "ticket" + (n === 0 && st.sort === "price" ? " first" : ""));
+      li.style.setProperty("--i", n);
+      const main = el("div", "t-main");
+      main.appendChild(el("div", "t-route", routeName(i) + (inPlan(i) ? " · 🎯 наши даты" : "")));
+      const price = el("div", "t-price", rub(i.p));
+      if (i.pp && i.pp !== i.p) price.appendChild(el("span", "drop " + (i.pp > i.p ? "down" : "up"), (i.pp > i.p ? "↓ −" : "↑ +") + rub(Math.abs(i.pp - i.p))));
+      main.append(price, el("div", "t-dates", T.short(i.d) + " → " + T.short(i.r) + " · " + T.nights(i) + " дн."),
+        el("div", "t-sub", [i.a, T.stops(i.t)].filter(Boolean).join(" · ") || "Туда-обратно"));
+      const go = el("a", "t-go", "Выбрать");
+      go.href = T.url(i); go.target = "_blank"; go.rel = "noopener";
+      go.setAttribute("aria-label", "Выбрать билет " + routeName(i) + " за " + rub(i.p));
       li.append(main, go);
       ul.appendChild(li);
     });
   }
 
-  function renderAll() { renderCalendar(); renderList(); }
+  function syncControls() {
+    document.querySelectorAll("#fromSeg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.o === st.from)));
+    document.querySelectorAll("[data-month]").forEach((b) => b.setAttribute("aria-pressed", String(!st.plan && b.dataset.month === st.month)));
+    $("planChip").setAttribute("aria-pressed", String(st.plan));
+    $("direct").setAttribute("aria-pressed", String(st.direct));
+    $("minDays").disabled = $("maxDays").disabled = st.plan;
+    const u = new URLSearchParams();
+    if (st.city !== "all") u.set("city", st.city);
+    if (st.from !== "all") u.set("from", st.from);
+    if (st.plan) u.set("plan", "1");
+    history.replaceState(null, "", location.pathname + (u.toString() ? "?" + u : ""));
+  }
+
+  function renderAll() { syncControls(); renderBest(); renderCityChips(); renderCalendar(); renderList(); }
 
   /* ---------- управление ---------- */
-  document.querySelectorAll("[data-month]").forEach((b) => b.addEventListener("click", () => {
-    st.month = b.dataset.month; st.day = null; st.shown = PAGE;
-    document.querySelectorAll("[data-month]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
-    renderAll();
-  }));
-  $("direct").addEventListener("click", () => {
-    st.direct = !st.direct; $("direct").setAttribute("aria-pressed", String(st.direct)); st.shown = PAGE; renderAll();
-  });
-  const num = (el, key, fallback) => el.addEventListener("input", () => {
-    const v = parseInt(el.value, 10); st[key] = Number.isFinite(v) ? v : fallback; st.shown = PAGE; renderAll();
-  });
-  num($("minDays"), "min", 1); num($("maxDays"), "max", 60);
+  document.querySelectorAll("#fromSeg button").forEach((b) => b.addEventListener("click", () => { st.from = b.dataset.o; T.store.set("origin", st.from); st.day = null; st.shown = PAGE; renderAll(); }));
+  document.querySelectorAll("[data-month]").forEach((b) => b.addEventListener("click", () => { st.month = b.dataset.month; st.plan = false; st.day = null; st.shown = PAGE; renderAll(); }));
+  $("planChip").addEventListener("click", () => { st.plan = !st.plan; st.month = "all"; st.day = null; st.shown = PAGE; renderAll(); });
+  $("direct").addEventListener("click", () => { st.direct = !st.direct; st.shown = PAGE; renderAll(); });
+  const numInput = (id, key, fallback) => $(id).addEventListener("input", () => { const v = parseInt($(id).value, 10); st[key] = Number.isFinite(v) ? v : fallback; st.shown = PAGE; renderAll(); });
+  numInput("minDays", "min", 1); numInput("maxDays", "max", 60);
   $("sort").addEventListener("change", () => { st.sort = $("sort").value; st.shown = PAGE; renderList(); });
   $("clearDay").addEventListener("click", () => { st.day = null; renderAll(); });
   $("more").addEventListener("click", () => { st.shown += PAGE; renderList(); });
 
-  /* ---------- данные и обновление ---------- */
-  let refreshing = false, pollTimer = null;
-  const ago = (ms) => { const m = Math.round(ms / 60000); if (m < 1) return "только что"; if (m < 60) return m + " мин назад"; const h = Math.floor(m / 60); return h < 48 ? h + " ч назад" : Math.floor(h / 24) + " дн назад"; };
-
-  function paintFresh() {
-    if (refreshing) return;
-    const el = $("fresh");
-    if (!generated) { el.textContent = "Данные ещё не обновлялись"; return; }
-    const d = new Date(generated), age = Date.now() - d;
-    el.textContent = "Данные от " + d.toLocaleString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) + " · " + ago(age);
-    el.classList.toggle("stale", age > 6 * 3600e3);
-  }
-  setInterval(paintFresh, 60000);
-
   function load() {
-    const get = (u) => fetch(u + "?" + Date.now()).then((r) => (r.ok ? r.json() : null)).catch(() => null);
-    return Promise.all([get("prices.json"), get("history.json")]).then(([p, h]) => {
-      items = p && p.items ? p.items.slice().sort((a, b) => a.p - b.p) : [];
-      generated = p ? p.generated : null;
-      points = h && h.points ? h.points : [];
-      renderSummary(); renderAll(); paintFresh();
+    return Promise.all([T.json("prices.json"), T.json("history.json"), T.json("data.json")]).then(([p, h, d]) => {
+      if (d && d.cities) meta = d;
+      items = p && p.items ? p.items.filter((i) => i.o && i.x) : [];
+      points = h && h.points ? h.points.filter((x) => x.c) : [];
+      fresh.set(p && p.generated);
+      renderAll();
     });
   }
-
-  function requestRefresh() {
-    if (refreshing) return;
-    refreshing = true;
-    $("refresh").disabled = true;
-    $("fresh").classList.remove("stale");
-    $("fresh").textContent = "Запрос отправлен. Обновление займёт до 10 минут, страница обновится сама.";
-    const known = generated;
-    fetch(URL_ + "/rest/v1/trip_state?id=eq.1", { method: "PATCH", headers: { ...H, Prefer: "return=minimal" }, body: JSON.stringify({ refresh_requested: true }) })
-      .then((r) => {
-        if (!r.ok) throw new Error();
-        const t0 = Date.now();
-        clearInterval(pollTimer);
-        pollTimer = setInterval(() => {
-          fetch("prices.json?" + Date.now()).then((r) => r.json()).then((p) => {
-            if (p.generated && p.generated !== known) { clearInterval(pollTimer); refreshing = false; $("refresh").disabled = false; load(); }
-            else if (Date.now() - t0 > 15 * 60e3) { clearInterval(pollTimer); refreshing = false; $("refresh").disabled = false; $("fresh").textContent = "Обновление задерживается. Попробуйте ещё раз чуть позже."; }
-          }).catch(() => {});
-        }, 20000);
-      })
-      .catch(() => { refreshing = false; $("refresh").disabled = false; $("fresh").textContent = "Не удалось отправить запрос. Проверьте, что в Supabase выполнен SQL для кнопки обновления."; });
-  }
-  $("refresh").addEventListener("click", requestRefresh);
-
   load();
 </script>
 </body>
