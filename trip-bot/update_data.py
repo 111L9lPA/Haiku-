@@ -11,7 +11,7 @@ import sys
 import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
@@ -27,6 +27,7 @@ PER_ROUTE = CONFIG.get("per_route_limit", 80)
 LINKS_PER_ROUTE = CONFIG.get("links_per_route", 20)
 HISTORY_LIMIT = 400
 PW = CONFIG["plan_window"]
+MIN_NIGHTS = CONFIG.get("min_nights", 1)
 
 
 def load(path, default):
@@ -87,6 +88,8 @@ def collect():
             d, r = (it.get("departure_at") or "")[:10], (it.get("return_at") or "")[:10]
             if not d or not r or r <= d or not it.get("price"):
                 continue
+            if (date.fromisoformat(r) - date.fromisoformat(d)).days < MIN_NIGHTS:
+                continue  # слишком короткая поездка
             key = (o, x, d, r)
             if key not in best or it["price"] < best[key]["p"]:
                 best[key] = {"o": o, "x": x, "d": d, "r": r, "p": int(it["price"]), "a": it.get("airline"),
@@ -186,6 +189,7 @@ def main():
         "updated_at": now,
         "trip_start": CONFIG["trip_start"],
         "plan_window": PW,
+        "min_nights": MIN_NIGHTS,
         "origins": CONFIG["origins"],
         "cities": CONFIG["cities"],
         "plan": plan[:40],

@@ -54,7 +54,7 @@
   <header>
     <a class="back" href="./">← Китай-радар</a>
     <h1>Календарь цен <span class="cn">中国</span></h1>
-    <p class="sub">Все билеты туда-обратно в ноябре и декабре: из Москвы и Краснодара во все города Китая. Ищите, когда и куда дешевле.</p>
+    <p class="sub">Все билеты туда-обратно в ноябре и декабре: из Москвы и Краснодара во все города Китая. Только поездки от 12 дней. Ищите, когда и куда дешевле.</p>
     <div class="refresh-row">
       <button class="ghost" id="refresh" type="button">🔄 Обновить цены</button>
       <div class="fresh" id="fresh" role="status"></div>
@@ -98,8 +98,8 @@
       <div class="label">Поездка</div>
       <div class="chips" style="align-items:center">
         <button class="chip" type="button" id="direct" aria-pressed="false">Без пересадок</button>
-        <label class="field">от <input class="num" id="minDays" type="number" min="1" max="60" value="3" inputmode="numeric"></label>
-        <label class="field">до <input class="num" id="maxDays" type="number" min="1" max="60" value="30" inputmode="numeric"> дн.</label>
+        <label class="field">от <input class="num" id="minDays" type="number" min="1" max="60" value="12" inputmode="numeric"></label>
+        <label class="field">до <input class="num" id="maxDays" type="number" min="1" max="60" value="40" inputmode="numeric"> дн.</label>
       </div>
     </div>
     <div class="group">
@@ -141,7 +141,7 @@
     from: q.get("from") || T.store.get("origin", "all"),
     city: q.get("city") || "all",
     month: "all", plan: q.get("plan") === "1", direct: false,
-    min: 3, max: 30, sort: "price", day: null, shown: PAGE,
+    min: 12, max: 40, sort: "price", day: null, shown: PAGE,
   };
   let items = [], points = [], meta = { cities: [], origins: [], plan_window: null };
 
