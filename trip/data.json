@@ -1,6 +1,10 @@
 {
   "destination": "Пекин",
   "trip_start": "2026-11-14",
-  "best": null,
-  "updated_at": null
+  "best": {
+    "price": 48261,
+    "dep": "2026-11-14",
+    "ret": "2026-11-27"
+  },
+  "updated_at": "2026-10-12T21:58+00:00"
 }
