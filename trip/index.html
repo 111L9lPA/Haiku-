@@ -5,36 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Отпуск в Китае</title>
   <style>
-    :root { --bg:#f2f1f7; --card:#fff; --fg:#1d1a2e; --muted:#6b6785; --accent:#5b3fd4; --accent-fg:#fff; --ok:#1f8f4e; }
+    :root { --bg:#f2f1f7; --card:#fff; --fg:#1d1a2e; --muted:#6b6785; --accent:#5b3fd4; --accent-fg:#fff;
+            --ok:#1f8f4e; --line:#e2dff0; }
     @media (prefers-color-scheme: dark) {
-      :root { --bg:#15122a; --card:#201c3b; --fg:#efecfb; --muted:#a29ec2; --accent:#9b86ff; --accent-fg:#15122a; --ok:#5fd18a; }
+      :root { --bg:#15122a; --card:#201c3b; --fg:#efecfb; --muted:#a29ec2; --accent:#9b86ff; --accent-fg:#15122a;
+              --ok:#5fd18a; --line:#322d55; }
     }
     * { box-sizing: border-box; }
-    body { margin:0; padding:16px; min-height:100vh; display:grid; place-items:center;
-      font-family:system-ui,sans-serif; background:var(--bg); color:var(--fg); }
-    main { width:100%; max-width:440px; background:var(--card); border-radius:18px; overflow:hidden; }
-    #photo { width:100%; aspect-ratio:4/3; object-fit:cover; display:block; background:var(--bg); }
+    body { margin:0; padding:16px; font-family:system-ui,sans-serif; background:var(--bg); color:var(--fg); }
+    main { max-width:480px; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
+    .card { background:var(--card); border-radius:18px; overflow:hidden; }
+    .hero { width:100%; aspect-ratio:1; object-fit:cover; display:block; }
     .body { padding:20px; display:flex; flex-direction:column; gap:12px; }
-    h1 { margin:0; font-size:24px; }
+    h1, h2 { margin:0; }
+    h1 { font-size:24px; }
+    h2 { font-size:18px; }
     .price { font-size:32px; font-weight:800; font-variant-numeric:tabular-nums; }
     .muted { color:var(--muted); font-size:14px; }
     .days { font-size:20px; }
-    button { padding:12px; font:inherit; font-weight:700; border:0; border-radius:10px;
-      background:var(--accent); color:var(--accent-fg); cursor:pointer; }
+    button, .btn { padding:12px; font:inherit; font-weight:700; border:0; border-radius:10px; text-align:center;
+      background:var(--accent); color:var(--accent-fg); cursor:pointer; text-decoration:none; }
     .bought { color:var(--ok); font-weight:700; }
+    ul { list-style:none; margin:0; padding:0; }
+    li { display:flex; align-items:center; gap:12px; padding:12px 0; border-top:1px solid var(--line); }
+    li:first-child { border-top:0; }
+    .num { width:28px; flex:none; color:var(--muted); font-variant-numeric:tabular-nums; }
+    .info { flex:1; min-width:0; }
+    .info b { font-size:18px; font-variant-numeric:tabular-nums; }
+    .go { flex:none; padding:8px 14px; font-size:14px; }
   </style>
 </head>
 <body>
 <main>
-  <img id="photo" alt="" hidden>
-  <div class="body">
-    <h1 id="title">Москва → Китай</h1>
-    <div class="price" id="price">…</div>
-    <div class="muted" id="dates"></div>
-    <div id="status"></div>
-    <div class="days" id="days"></div>
-    <button id="toggle" type="button">Отметить: билет куплен</button>
-    <div class="muted" id="updated"></div>
+  <div class="card">
+    <img class="hero" src="china.jpg" alt="Китай">
+    <div class="body">
+      <h1 id="title">Москва → Китай</h1>
+      <div class="price" id="price">…</div>
+      <div class="muted" id="dates"></div>
+      <div id="status"></div>
+      <div class="days" id="days"></div>
+      <button id="toggle" type="button">Отметить: билет куплен</button>
+      <div class="muted" id="updated"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="body">
+      <h2>Все цены, от дешёвых к дорогим</h2>
+      <ul id="offers"></ul>
+      <div class="muted" id="offersNote"></div>
+    </div>
   </div>
 </main>
 <script>
@@ -46,20 +67,49 @@
 
   const rub = (n) => n.toLocaleString("ru-RU") + " ₽";
   const dm = (iso) => new Date(iso + "T00:00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
+  const stops = (n) => n == null ? "" : n === 0 ? "без пересадок" : n + " пер.";
 
   function renderStatus() {
     $("status").innerHTML = bought ? '<span class="bought">✅ Билет куплен</span>' : "⏳ Билет не куплен";
     $("toggle").textContent = bought ? "Отметить: билет не куплен" : "Отметить: билет куплен";
   }
 
+  function renderOffers(offers) {
+    const ul = $("offers");
+    ul.textContent = "";
+    if (!offers.length) { $("offersNote").textContent = "Цены пока не найдены."; return; }
+    offers.forEach((o, i) => {
+      const li = document.createElement("li");
+      const num = document.createElement("div");
+      num.className = "num"; num.textContent = i + 1;
+      const info = document.createElement("div");
+      info.className = "info";
+      const b = document.createElement("b");
+      b.textContent = rub(o.price);
+      const sub = document.createElement("div");
+      sub.className = "muted";
+      sub.textContent = [dm(o.dep) + " → " + dm(o.ret), o.airline, stops(o.transfers)].filter(Boolean).join(" · ");
+      info.append(b, sub);
+      li.append(num, info);
+      if (o.link) {
+        const a = document.createElement("a");
+        a.className = "btn go"; a.href = o.link; a.target = "_blank"; a.rel = "noopener"; a.textContent = "Открыть";
+        li.appendChild(a);
+      }
+      ul.appendChild(li);
+    });
+  }
+
   fetch("data.json?" + Date.now()).then((r) => r.json()).then((d) => {
     $("title").textContent = "Москва → " + d.destination;
-    if (d.best) {
-      $("price").textContent = rub(d.best.price) + " туда-обратно";
-      $("dates").textContent = "Вылет " + dm(d.best.dep) + ", возврат " + dm(d.best.ret);
+    const offers = d.offers || (d.best ? [d.best] : []);
+    if (offers.length) {
+      $("price").textContent = "от " + rub(offers[0].price);
+      $("dates").textContent = "Вылет " + dm(offers[0].dep) + ", возврат " + dm(offers[0].ret);
     } else {
       $("price").textContent = "Цены пока не найдены";
     }
+    renderOffers(offers);
     if (d.updated_at) $("updated").textContent = "Обновлено: " + new Date(d.updated_at).toLocaleString("ru-RU");
     const left = Math.ceil((new Date(d.trip_start + "T00:00:00") - new Date()) / 864e5);
     $("days").textContent = left > 0 ? "До отпуска: " + left + " дн." : "Отпуск уже начался";
@@ -76,17 +126,6 @@
       method: "PATCH", headers: { ...H, Prefer: "return=minimal" }, body: JSON.stringify({ ticket_bought: next })
     }).then((r) => { if (r.ok) { bought = next; renderStatus(); } });
   });
-
-  // Случайное фото из ваших загрузок на главной странице сайта (бакет photos)
-  fetch(URL_ + "/storage/v1/object/list/photos", {
-    method: "POST", headers: H, body: JSON.stringify({ prefix: "", limit: 200 })
-  }).then((r) => r.json()).then((items) => {
-    const imgs = (Array.isArray(items) ? items : []).filter((i) => i.name && /\.(jpe?g|png|webp)$/i.test(i.name));
-    if (!imgs.length) return;
-    const pick = imgs[Math.floor(Math.random() * imgs.length)].name;
-    $("photo").src = URL_ + "/storage/v1/object/public/photos/" + encodeURIComponent(pick);
-    $("photo").hidden = false;
-  }).catch(() => {});
 </script>
 </body>
 </html>
