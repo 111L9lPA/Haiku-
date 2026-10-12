@@ -1,0 +1,10 @@
+{
+  "origin": "MOW",
+  "destination": "PEK",
+  "destination_name": "Пекин",
+  "trip_start": "2026-11-14",
+  "depart_days": ["2026-11-13", "2026-11-14"],
+  "return_days": ["2026-11-27", "2026-11-28", "2026-11-29", "2026-11-30"],
+  "photo_bucket": "trip-photos",
+  "message_id": null
+}
