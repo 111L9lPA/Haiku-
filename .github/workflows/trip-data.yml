@@ -1,35 +1,86 @@
 name: Update trip prices
 
+# Каждые 5 минут проверяем, нужно ли обновляться: по кнопке «Обновить данные» на сайте
+# или если данным больше 4 часов. Сама проверка занимает несколько секунд.
 on:
   schedule:
-    - cron: "0 */4 * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: trip-update
+  cancel-in-progress: false
+
+env:
+  SB_URL: https://exmxqybejhbtnbtqcwms.supabase.co
+  # Публичный (publishable) ключ Supabase: его безопасно хранить в коде.
+  SB_KEY: sb_publishable_H_c3d5terU1y4slV6t-ChQ_bnfECYM2
 
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Decide whether to update
+        id: check
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          run=false
+          if [ "$EVENT" = "workflow_dispatch" ]; then run=true; fi
+          flag=$(curl -sS "$SB_URL/rest/v1/trip_state?id=eq.1&select=refresh_requested" -H "apikey: $SB_KEY" | jq -r '.[0].refresh_requested // false' 2>/dev/null || true)
+          if [ "$flag" = "true" ]; then run=true; fi
+          last=$(jq -r '.updated_at // empty' trip/data.json 2>/dev/null || true)
+          if [ -z "$last" ]; then
+            run=true
+          else
+            age=$(( $(date +%s) - $(date -d "$last" +%s) ))
+            if [ "$age" -ge 14100 ]; then run=true; fi
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+          echo "flag=$flag" >> "$GITHUB_OUTPUT"
+
+      - name: Clear refresh request
+        if: steps.check.outputs.flag == 'true'
+        run: |
+          curl -sS -X PATCH "$SB_URL/rest/v1/trip_state?id=eq.1" \
+            -H "apikey: $SB_KEY" -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d '{"refresh_requested":false}'
+
       - uses: actions/setup-python@v5
+        if: steps.check.outputs.run == 'true'
         with:
           python-version: "3.12"
-      - run: pip install requests
+
+      - name: Install
+        if: steps.check.outputs.run == 'true'
+        run: pip install requests
+
       - name: Fetch prices
+        if: steps.check.outputs.run == 'true'
         env:
           TP_TOKEN: ${{ secrets.TP_TOKEN }}
         run: python trip-bot/update_data.py
+
       - name: Update Telegram message
+        if: steps.check.outputs.run == 'true'
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: python trip-bot/telegram_update.py
+
       - name: Commit data
+        if: steps.check.outputs.run == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add trip/data.json
-          [ -f trip/tg.json ] && git add trip/tg.json || true
-          git diff --staged --quiet || (git commit -m "Update trip prices" && git push)
+          git add -A trip
+          if ! git diff --staged --quiet; then
+            git commit -m "Update trip prices"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push
+          fi
