@@ -4,7 +4,193 @@
   "best": {
     "price": 48261,
     "dep": "2026-11-14",
-    "ret": "2026-11-27"
+    "ret": "2026-11-27",
+    "airline": "CA",
+    "transfers": 1,
+    "return_transfers": 1,
+    "link": "https://www.aviasales.ru/search/MOW1411PEK27111?t=CA17946939001794751800000665SVOURCPEK17958108001795898100001755PEKURCSVO_1dde392ed23af379ca77ef4aacf38943_48164&search_date=11102026&expected_price_uuid=01a1299e-149a-8030-2261-928eb8b26ca3&static_fare_key=TY%7CP0%7CH1%7CL1_1_23%7CCH0%7CR0%7CTBC1&itinerary_key=2rEWQOqLFi8sHrjpNxd5TA&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=48261"
   },
-  "updated_at": "2026-10-12T22:08+00:00"
+  "offers": [
+    {
+      "price": 48261,
+      "dep": "2026-11-14",
+      "ret": "2026-11-27",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK27111?t=CA17946939001794751800000665SVOURCPEK17958108001795898100001755PEKURCSVO_1dde392ed23af379ca77ef4aacf38943_48164&search_date=11102026&expected_price_uuid=01a1299e-149a-8030-2261-928eb8b26ca3&static_fare_key=TY%7CP0%7CH1%7CL1_1_23%7CCH0%7CR0%7CTBC1&itinerary_key=2rEWQOqLFi8sHrjpNxd5TA&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=48261"
+    },
+    {
+      "price": 48261,
+      "dep": "2026-11-14",
+      "ret": "2026-11-28",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK28111?t=CA17946939001794751800000665SVOURCPEK17958561001795898100001000PEKURCSVO_50cb3dded91ed2186a849a9bac25f830_48164&search_date=11102026&expected_price_uuid=01a12c95-b615-8030-2ddc-0b83beb07afd&static_fare_key=TY%7CP1%7CH1%7CL1_1_23%7CCH0%7CR0%7CTBC1&itinerary_key=K-CAWJvgT22I08pUXE5tWg&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=48261"
+    },
+    {
+      "price": 57517,
+      "dep": "2026-11-14",
+      "ret": "2026-11-30",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK30111?t=3U17946939001794751800000665SVOURCPEK17960697001796155200001725PEKTFUSVO_878d5c07f135eb2faeba15a50aa8c179_57523&search_date=09102026&expected_price_uuid=01a11fa1-b629-8031-6926-5d544d4c78c0&static_fare_key=TY%7CP1%7CH1%7CL1_1_23%7CCH0%7CR0%7CTBC1&itinerary_key=BKiWXUL9yVRdaf4_rfXJzA&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=57517"
+    },
+    {
+      "price": 58216,
+      "dep": "2026-11-14",
+      "ret": "2026-11-27",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 0,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK27111?t=CA17946939001794751800000665SVOURCPEK17957790001795791900000515PEKSVO_f71b82851cb1b25599e8e166fcfbb156_58099&search_date=11102026&expected_price_uuid=01a1299e-149a-8030-2261-928eb8b26ca3&static_fare_key=TY%7CP0%7CH1%7CL1_1_23%7CCH0%7CR0%7CTBC1&itinerary_key=NDSO5pPboQecMHyubP9c_g&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=58216"
+    },
+    {
+      "price": 58352,
+      "dep": "2026-11-13",
+      "ret": "2026-11-30",
+      "airline": "F7",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1311PEK30111?t=SU17945931001794677100001100SVOVVOPEK17960361001796136600001975PEKVVOSVO_b60f52c740830b3d7e8bd0cbf1738bf5_58235&search_date=11102026&expected_price_uuid=01a12b45-a087-8030-6bf5-3c8edfb978e2&static_fare_key=TY%7CP1%7CH1%7CL1_1_23%7CCH1%7CR1%7CTBC1&itinerary_key=XD4EO_xRWGIO5YXXymRMDA&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=58352"
+    },
+    {
+      "price": 59466,
+      "dep": "2026-11-14",
+      "ret": "2026-11-29",
+      "airline": "FV",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK29111?t=SU17946882001794763500000955SVOVVOPEK17959563001796053200001915PEKVVOSVO_2e28155d207ec01835da2b310360de4e_59466&search_date=12102026&expected_price_uuid=01a131fe-bf58-8031-2853-cd5fdb48d41b&static_fare_key=TY%7CP1%7CH1%7CL1_1_23%7CCH1%7CR1%7CTBC1&itinerary_key=xghR_MBj3dU6rH08udzvMw&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=59466"
+    },
+    {
+      "price": 60315,
+      "dep": "2026-11-14",
+      "ret": "2026-11-30",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 0,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK30111?t=CA17946939001794751800000665SVOURCPEK17960481001796060400000505PEKSVO_ac2a53446c2dba8e854f6bc34c22edc9_60322&search_date=09102026&expected_price_uuid=01a11fa1-b629-8031-6926-5d544d4c78c0&static_fare_key=TY%7CP1%7CH1%7CL1_1_23%7CCH1%7CR0%7CTBC1&itinerary_key=rmhpb5GGDrfL8n1okOgmLQ&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=60315"
+    },
+    {
+      "price": 60526,
+      "dep": "2026-11-14",
+      "ret": "2026-11-28",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK28111?t=S717946939001794751800000665SVOURCPEK17958705001795949700001620PEKIKTDME_355424fc1f057deb92cf595ddb779716_60405&search_date=11102026&expected_price_uuid=01a12c95-b615-8030-2ddc-0b83beb07afd&static_fare_key=TY%7CP1%7CH1%7CL0%7CCH0%7CR0%7CTBC0&itinerary_key=suzC3faS0--Dk3lLu1mgug&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=60526"
+    },
+    {
+      "price": 60690,
+      "dep": "2026-11-14",
+      "ret": "2026-11-29",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK29111?t=S717946939001794751800000665SVOURCPEK17959560001796036100001635PEKIKTDME_3173c81bdf2ac787ba12ebbc9d18cc45_60690&search_date=12102026&expected_price_uuid=01a131fe-bf58-8031-2853-cd5fdb48d41b&static_fare_key=TY%7CP1%7CH1%7CL0%7CCH0%7CR0%7CTBC0&itinerary_key=pvy0whIyoAHmhSFRn_ivow&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=60690"
+    },
+    {
+      "price": 60747,
+      "dep": "2026-11-13",
+      "ret": "2026-11-29",
+      "airline": "F7",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1311PEK29111?t=SU17945931001794677100001100SVOVVOPEK17959356001795966800000820PEKVVOSVO_a0cf93a36f18238fa05c4b1efb5700d0_60744&search_date=08102026&expected_price_uuid=01a11ca5-1eb1-8030-2d38-5d80917e0a97&static_fare_key=TY%7CP1%7CH1%7CL1_1_23%7CCH0%7CR0%7CTBC1&itinerary_key=iYkvONU43tpDRhMJwK9F2Q&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=60747"
+    },
+    {
+      "price": 60797,
+      "dep": "2026-11-14",
+      "ret": "2026-11-29",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK29111?t=SU17946939001794751800000665SVOURCPEK17959560001796022000001400PEKIKTSVO_63422273bbc5613dfee51c37438cf61e_60797&search_date=12102026&expected_price_uuid=01a131fe-bf58-8031-2853-cd5fdb48d41b&static_fare_key=TY%7CP1%7CH1%7CL0%7CCH0%7CR0%7CTBC0&itinerary_key=k0_RwITtkFL6BNRYQUYxCA&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=60797"
+    },
+    {
+      "price": 60960,
+      "dep": "2026-11-13",
+      "ret": "2026-11-30",
+      "airline": "S7",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1311PEK30111?t=S717945715001794689700001670DMEIKTPEK17960436001796122500001615PEKIKTDME_9c5a887a40b7b38919d0675a7899a140_60838&search_date=11102026&expected_price_uuid=01a12b45-a087-8030-6bf5-3c8edfb978e2&static_fare_key=TY%7CP1%7CH1%7CL0%7CCH1%7CR0%7CTBC0&itinerary_key=IpLWnAVXugW1oJqUNtJxTg&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=60960"
+    },
+    {
+      "price": 62597,
+      "dep": "2026-11-14",
+      "ret": "2026-11-28",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 0,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK28111?t=CA17946939001794751800000665SVOURCPEK17958654001795878300000515PEKSVO_874638175e64b99eae55b69e86939ab3_62471&search_date=11102026&expected_price_uuid=01a12c95-b615-8030-2ddc-0b83beb07afd&static_fare_key=TY%7CP1%7CH1%7CL1_1_23%7CCH1%7CR0%7CTBC1&itinerary_key=RIOa9H0tvtayfe_Slji17g&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=62597"
+    },
+    {
+      "price": 62641,
+      "dep": "2026-11-14",
+      "ret": "2026-11-29",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK29111?t=SU17946939001794751800000665SVOURCPEK17959563001795991100000880PEKVVOSVO_91dd147abcf64b658d2bb3e90a2f3cab_62641&search_date=12102026&expected_price_uuid=01a131fe-bf58-8031-2853-cd5fdb48d41b&static_fare_key=TY%7CP1%7CH1%7CL1_1_23%7CCH0%7CR0%7CTBC1&itinerary_key=aFh-rQN24AbzsnX47rNDyg&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=62641"
+    },
+    {
+      "price": 62643,
+      "dep": "2026-11-14",
+      "ret": "2026-11-29",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 0,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK29111?t=CA17946939001794751800000665SVOURCPEK17959518001795964700000515PEKSVO_e1c9d14f7d09aebabc5c104f2e8b2efd_62643&search_date=12102026&expected_price_uuid=01a131fe-bf58-8031-2853-cd5fdb48d41b&static_fare_key=TY%7CP1%7CH1%7CL1_1_23%7CCH0%7CR0%7CTBC1&itinerary_key=WKEc9Q6_CPI9jDS-y6-4hQ&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=62643"
+    },
+    {
+      "price": 63319,
+      "dep": "2026-11-13",
+      "ret": "2026-11-28",
+      "airline": "FV",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1311PEK28111?t=SU17946045001794677100000910SVOVVOPEK17958654001795898100000845PEKURCSVO_868e10d0ffb9d755f5cdccf711a374ae_63310&search_date=11102026&expected_price_uuid=01a12cdb-408d-8031-2ede-8978b95a0838&static_fare_key=TY%7CP0%7CH1%7CL1_1_23%7CCH0%7CR0%7CTBC1&itinerary_key=gV9zJWkQvOb5ZxDemnnGJg&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=63319"
+    },
+    {
+      "price": 63364,
+      "dep": "2026-11-14",
+      "ret": "2026-11-28",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK28111?t=SU17946939001794762000000835SVOURCPEK17958705001795900800000805PEKIKTSVO_c4781cb280bfd825169a55cbd80ce0a2_63237&search_date=11102026&expected_price_uuid=01a12c95-b615-8030-2ddc-0b83beb07afd&static_fare_key=TY%7CP1%7CH1%7CL0%7CCH0%7CR0%7CTBC0&itinerary_key=3PAhm3RDD7Zz8WubNZfPzw&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=63364"
+    },
+    {
+      "price": 63763,
+      "dep": "2026-11-13",
+      "ret": "2026-11-28",
+      "airline": "FV",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1311PEK28111?t=CA17946108001794689700001015SVOIKTPEK17958654001795898100000845PEKURCSVO_9f5a9310a42ec06f640261af2323c939_63754&search_date=11102026&expected_price_uuid=01a12cdb-408d-8031-2ede-8978b95a0838&static_fare_key=TY%7CP0%7CH1%7CL0%7CCH0%7CR0%7CTBC0&itinerary_key=9Vt3eh6FonXeirWGFWv7Vg&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=63763"
+    },
+    {
+      "price": 63798,
+      "dep": "2026-11-14",
+      "ret": "2026-11-27",
+      "airline": "CA",
+      "transfers": 1,
+      "return_transfers": 2,
+      "link": "https://www.aviasales.ru/search/MOW1411PEK27111?t=CA17946939001794751800000665SVOURCPEK17957589001795808400001125PEKALATASDME_96f603254930493afb94b379ed100899_63670&search_date=11102026&expected_price_uuid=01a1299e-149a-8030-2261-928eb8b26ca3&static_fare_key=TY%7CP0%7CH1%7CL0%7CCH1%7CR0%7CTBC0&itinerary_key=U6zdKcMJUqa2djA0-l4RDg&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=63798"
+    },
+    {
+      "price": 63905,
+      "dep": "2026-11-13",
+      "ret": "2026-11-30",
+      "airline": "FV",
+      "transfers": 1,
+      "return_transfers": 1,
+      "link": "https://www.aviasales.ru/search/MOW1311PEK30111?t=SU17946108001794689700001015SVOIKTPEK17960436001796127900001705PEKIKTSVO_38396face505725093518b6fcd0cf1ba_63777&search_date=11102026&expected_price_uuid=01a12b45-a087-8030-6bf5-3c8edfb978e2&static_fare_key=TY%7CP1%7CH1%7CL0%7CCH1%7CR0%7CTBC0&itinerary_key=yzCfIfwDyLEBlAXvjk40Aw&origin_airports=1&destination_airports=0&expected_price_source=share&expected_price_currency=rub&expected_price=63905"
+    }
+  ],
+  "updated_at": "2026-10-12T22:16+00:00"
 }
