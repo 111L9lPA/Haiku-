@@ -1,0 +1,36 @@
+name: Sync radar
+
+# Передаёт токены из секретов GitHub в серверную функцию Supabase (Китай-радар).
+# Функция проверяет подпись GitHub (OIDC), поэтому подделать этот запрос нельзя.
+# Запускается вручную, при изменении этого файла и раз в сутки (на случай, если токены поменяли).
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/hello-59qjrs]
+    paths: [".github/workflows/radar-sync.yml"]
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Send tokens to Supabase
+        env:
+          TP_TOKEN: ${{ secrets.TP_TOKEN }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          FN_URL: https://exmxqybejhbtnbtqcwms.supabase.co/functions/v1/radar
+        run: |
+          jwt=$(curl -sS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=kitai-radar" \
+            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" | jq -r .value)
+          body=$(jq -n --arg tp "$TP_TOKEN" --arg tg "$TG_BOT_TOKEN" --arg owner "$TG_CHAT_ID" \
+            '{action: "sync", tp: $tp, tg: $tg, owner: $owner}')
+          curl -sS --fail-with-body -X POST "$FN_URL" \
+            -H "Content-Type: application/json" -H "x-github-oidc: $jwt" -d "$body"
+          echo

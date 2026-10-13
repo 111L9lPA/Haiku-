@@ -81,27 +81,34 @@
       return { set(v) { iso = v; paint(); }, busy(v, text) { busy = v; if (text) { el.classList.remove("stale"); el.textContent = text; } else paint(); }, get: () => iso };
     },
 
-    /* кнопка «Обновить»: ставит флаг в Supabase, GitHub подхватывает его в течение ~5 минут */
+    /* готовые данные из Supabase (data, prices, history); если недоступно, берём снимок из репозитория */
+    blob(name) {
+      return fetch(SB_URL + "/rest/v1/radar_blob?select=body&name=eq." + name, { headers: H })
+        .then((r) => (r.ok ? r.json() : []))
+        .then((rows) => (rows[0] ? rows[0].body : T.json(name + ".json")))
+        .catch(() => T.json(name + ".json"));
+    },
+
+    /* кнопка «Обновить»: серверная функция ищет цены прямо сейчас, это 10–20 секунд */
     refresher(btn, fresh, onDone) {
-      let timer = null;
-      const finish = (text) => { clearInterval(timer); btn.disabled = false; fresh.busy(false); if (text) fresh.busy(true, text), setTimeout(() => fresh.busy(false), 8000); };
+      const flash = (text) => { fresh.busy(true, text); setTimeout(() => fresh.busy(false), 7000); };
       const run = () => {
         if (btn.disabled) return;
         btn.disabled = true;
-        const known = fresh.get();
-        fresh.busy(true, "Запрос отправлен 🔎 Ищу цены по всему Китаю, это займёт до 10 минут. Страница обновится сама.");
-        fetch(SB_URL + "/rest/v1/trip_state?id=eq.1", { method: "PATCH", headers: { ...H, Prefer: "return=minimal" }, body: JSON.stringify({ refresh_requested: true }) })
-          .then((r) => {
-            if (!r.ok) throw new Error();
-            const t0 = Date.now();
-            timer = setInterval(() => {
-              T.json("data.json").then((d) => {
-                if (d && d.updated_at && d.updated_at !== known) { finish(); onDone(d); }
-                else if (Date.now() - t0 > 15 * 60e3) finish("Обновление задерживается. Попробуйте ещё раз чуть позже.");
-              });
-            }, 20000);
+        const t0 = Date.now();
+        const tick = () => fresh.busy(true, "🔎 Ищу цены по всему Китаю… " + Math.round((Date.now() - t0) / 1000) + " сек");
+        tick();
+        const timer = setInterval(tick, 1000);
+        const done = (text, data) => { clearInterval(timer); btn.disabled = false; fresh.busy(false); if (data) onDone(data); flash(text); };
+        fetch(SB_URL + "/functions/v1/radar", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "refresh" }) })
+          .then((r) => r.json())
+          .then((res) => {
+            if (res.status === "ok") done("Готово ✨ Цены обновлены", res.data);
+            else if (res.status === "fresh") done("Цены свежие: обновлены меньше минуты назад ✨", res.data);
+            else if (res.status === "busy") done("Поиск уже идёт, через полминуты нажмите ещё раз", res.data);
+            else done("Не получилось обновить: " + (res.error || "ошибка сервера"), res.data);
           })
-          .catch(() => finish("Не удалось отправить запрос. Проверьте, что в Supabase выполнен SQL из инструкции."));
+          .catch(() => done("Нет связи с сервером. Попробуйте ещё раз."));
       };
       btn.addEventListener("click", run);
       return run;

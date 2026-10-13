@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Golos+Text:wght@400;600&family=Ma+Shan+Zheng&display=swap">
-  <link rel="stylesheet" href="common.css?v=5">
+  <link rel="stylesheet" href="common.css?v=6">
   <style>
     /* ---------- герой ---------- */
     .hero { position: relative; margin-inline: -16px; aspect-ratio: 1 / 1; max-height: 80vh; overflow: hidden; border-radius: 0 0 28px 28px; isolation: isolate; }
@@ -213,7 +213,7 @@
     Бот в Telegram: /top, /update, /bought, /phrase. Позовите друга: пусть напишет боту /start.</p>
 </main>
 
-<script src="common.js?v=5"></script>
+<script src="common.js?v=6"></script>
 <script>
   const { $, el, rub } = T;
   let D = null;
@@ -433,7 +433,7 @@
 
   /* ---------- старт ---------- */
   setOrigin(origin);
-  Promise.all([T.json("data.json"), T.json("phrases.json")]).then(([d, p]) => {
+  Promise.all([T.blob("data"), T.json("phrases.json")]).then(([d, p]) => {
     phrases = p || [];
     phraseIdx = Math.floor(Date.now() / 864e5) + 719163;  // тот же номер дня, что у бота
     showPhrase();

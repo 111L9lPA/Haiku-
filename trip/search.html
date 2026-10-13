@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Golos+Text:wght@400;600&family=Ma+Shan+Zheng&display=swap">
-  <link rel="stylesheet" href="common.css?v=5">
+  <link rel="stylesheet" href="common.css?v=6">
   <style>
     body { padding-block: 20px 56px; }
     .back { color: var(--gold); text-decoration: none; font-size: 14px; }
@@ -132,7 +132,7 @@
   <p class="foot">Цены из кэша Aviasales и могут измениться при покупке. Обновляются сами раз в 4 часа или по кнопке.</p>
 </main>
 
-<script src="common.js?v=5"></script>
+<script src="common.js?v=6"></script>
 <script>
   const { $, el, rub } = T;
   const PAGE = 25;
@@ -321,7 +321,7 @@
   $("more").addEventListener("click", () => { st.shown += PAGE; renderList(); });
 
   function load() {
-    return Promise.all([T.json("prices.json"), T.json("history.json"), T.json("data.json")]).then(([p, h, d]) => {
+    return Promise.all([T.blob("prices"), T.blob("history"), T.blob("data")]).then(([p, h, d]) => {
       if (d && d.cities) meta = d;
       items = p && p.items ? p.items.filter((i) => i.o && i.x) : [];
       points = h && h.points ? h.points.filter((x) => x.c) : [];

@@ -1,4 +1,5 @@
-{
+// Настройки Китай-радара: даты, города вылета и города Китая
+export const CONFIG = {
   "trip_start": "2026-11-14",
   "plan_window": {
     "depart_from": "2026-11-13",
@@ -179,4 +180,4 @@
   "per_route_limit": 80,
   "links_per_route": 20,
   "min_nights": 12
-}
+} as const;
