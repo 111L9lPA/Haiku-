@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d0a12">
+  <title>Китай для нас</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Golos+Text:wght@400;600&family=Ma+Shan+Zheng&display=swap">
+  <link rel="stylesheet" href="common.css?v=7">
+  <style>
+    body { padding-block: 20px 56px; }
+    .back { color: var(--gold); text-decoration: none; font-size: 14px; }
+    h1 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 9vw, 40px); letter-spacing: -.02em; line-height: 1.1; margin-top: 10px; animation: rise .7s both; }
+    h1 .cn { font-family: var(--brush); font-weight: 400; color: var(--gold); }
+    .clock { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 14px; color: var(--muted); }
+    .clock b { color: var(--paper); font-variant-numeric: tabular-nums; }
+
+    .tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; margin-inline: -16px; padding: 10px 16px; background: rgba(13,10,18,.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+    .tabs .chips { margin: 0; }
+    .tabs .chip { text-decoration: none; color: var(--paper); }
+
+    section[data-tab] { scroll-margin-top: 70px; }
+    .hz-big { font-family: var(--brush); font-size: clamp(56px, 18vw, 92px); line-height: 1.05; color: var(--gold); text-align: center; overflow-wrap: anywhere; }
+    .py { font-size: 20px; font-style: italic; text-align: center; }
+    .ru { font-size: 18px; text-align: center; color: var(--paper); }
+    .center { text-align: center; }
+    .row-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .row-btns > * { flex: 1 1 140px; }
+
+    /* карточка-переворот */
+    .flip { perspective: 1000px; cursor: pointer; min-height: 230px; }
+    .flip-inner { position: relative; min-height: 230px; transition: transform .5s; transform-style: preserve-3d; }
+    .flip.on .flip-inner { transform: rotateY(180deg); }
+    .face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 18px; background: var(--ink); border: 1px solid var(--line); }
+    .face.back { transform: rotateY(180deg); background: linear-gradient(160deg, #2a1f2f, var(--ink)); border-color: rgba(244,185,66,.5); }
+    .face small { color: var(--muted); font-size: 12px; }
+    @media (prefers-reduced-motion: reduce) { .flip-inner { transition: none; } }
+
+    .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .opt { font: inherit; font-size: 15px; padding: 14px 10px; border-radius: 14px; border: 1px solid var(--line); background: var(--ink); color: var(--paper); cursor: pointer; transition: all .15s; min-height: 58px; }
+    .opt:hover { border-color: var(--gold); }
+    .opt.good { background: rgba(67,198,165,.2); border-color: var(--jade); }
+    .opt.bad { background: rgba(255,90,74,.18); border-color: var(--red-hot); }
+    .opt .h { font-family: var(--brush); font-size: 22px; color: var(--gold); display: block; }
+    .stats { display: flex; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+    .stats b { color: var(--paper); }
+    .lvl { letter-spacing: 2px; color: var(--gold); }
+    .bar { height: 8px; border-radius: 4px; background: var(--ink); overflow: hidden; }
+    .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--jade), var(--gold)); transition: width .4s; }
+    .wordlist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 6px; max-height: 340px; overflow: auto; }
+    .wordlist li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: baseline; padding: 8px 4px; border-top: 1px solid var(--line); font-size: 14px; }
+    .wordlist .h { font-family: var(--brush); font-size: 20px; color: var(--gold); }
+    .wordlist .lvl { font-size: 11px; }
+    .wordlist button { background: none; border: 0; font-size: 16px; cursor: pointer; padding: 0 4px; }
+
+    .foods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    @media (min-width: 600px) { .foods { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .food { font: inherit; text-align: left; color: var(--paper); background: var(--ink); border: 1px solid var(--line); border-radius: 16px; padding: 14px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; transition: transform .2s, border-color .2s; }
+    .food:hover { transform: translateY(-2px); border-color: rgba(244,185,66,.5); }
+    .food .e { font-size: 28px; }
+    .food .n { font-weight: 600; }
+    .food .h { font-family: var(--brush); font-size: 20px; color: var(--gold); }
+
+    .modal { position: fixed; inset: 0; z-index: 20; background: rgba(5,3,8,.85); display: grid; place-items: center; padding: 16px; }
+    .modal[hidden] { display: none; }
+    .modal .box { width: 100%; max-width: 460px; border-radius: 24px; background: var(--paper); color: #1a1220; padding: 24px; display: flex; flex-direction: column; gap: 10px; text-align: center; animation: pop .35s both; }
+    .modal .box .hz-big { color: var(--red); }
+    .modal .box p { margin: 0; line-height: 1.45; }
+    .modal .box .ghost { color: #1a1220; border-color: rgba(0,0,0,.2); }
+
+    .prices { list-style: none; margin: 0; padding: 0; }
+    .prices li { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; padding: 8px 0; border-top: 1px solid var(--line); }
+    .prices li b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .conv { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: end; }
+    .conv label, .budget label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
+    .conv input, .budget input { width: 100%; font-size: 17px; font-variant-numeric: tabular-nums; }
+    .conv span { color: var(--muted); padding-bottom: 12px; }
+    .budget { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .budget-out { font-family: var(--display); font-weight: 800; font-size: 26px; }
+
+    details { border-top: 1px solid var(--line); padding: 12px 2px; }
+    details:first-of-type { border-top: 0; }
+    summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; gap: 10px; align-items: center; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; margin-left: auto; color: var(--gold); font-size: 20px; }
+    details[open] summary::after { content: "−"; }
+    details p { margin: 10px 0 0; color: var(--muted); line-height: 1.5; }
+
+    .weather { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .weather th { text-align: left; color: var(--muted); font-weight: 400; font-size: 12px; padding: 6px 4px; cursor: pointer; }
+    .weather td { padding: 7px 4px; border-top: 1px solid var(--line); }
+    .weather td.t { width: 22%; }
+    .temp { display: inline-block; min-width: 42px; padding: 3px 6px; border-radius: 8px; text-align: center; font-variant-numeric: tabular-nums; font-weight: 600; color: #1a1220; }
+    .wrap-x { overflow-x: auto; }
+
+    .fact { font-size: 19px; line-height: 1.5; min-height: 110px; animation: pop .4s both; }
+    .score { font-family: var(--display); font-weight: 800; font-size: 20px; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <a class="back" href="./">← Китай-радар</a>
+    <h1>Китай для нас <span class="cn">中国</span></h1>
+    <div class="clock"><span>🕗 В Пекине сейчас <b id="bjTime">—</b></span><span>Москва <b id="mskTime">—</b></span><span>разница +5 ч</span></div>
+  </header>
+
+  <nav class="tabs" aria-label="Разделы">
+    <div class="chips scroll">
+      <a class="chip" href="#words">🀄 Слова</a>
+      <a class="chip" href="#game">🏯 Угадай город</a>
+      <a class="chip" href="#food">🍜 Еда</a>
+      <a class="chip" href="#yuan">💴 Юани</a>
+      <a class="chip" href="#tips">🧳 Шпаргалка</a>
+      <a class="chip" href="#weather">🌤 Погода</a>
+      <a class="chip" href="#facts">🎲 Факты</a>
+    </div>
+  </nav>
+
+  <!-- ===== Слова ===== -->
+  <section class="card" data-tab id="words">
+    <div class="eyebrow">🀄 Учим китайский</div>
+    <h2>Самые нужные слова для поездки</h2>
+    <div class="stats"><span>🎓 Выучено: <b id="learned">0</b> из <b id="total">0</b></span><span>🎯 Точность: <b id="acc">—</b></span><span>🔥 Серия: <b id="streak">0</b></span></div>
+    <div class="bar"><i id="learnBar" style="width:0"></i></div>
+    <div class="chips" id="catChips"></div>
+    <div class="segment" role="group" aria-label="Режим">
+      <button type="button" data-mode="quiz" aria-pressed="true">🎮 Квиз</button>
+      <button type="button" data-mode="cards" aria-pressed="false">🃏 Карточки</button>
+      <button type="button" data-mode="list" aria-pressed="false">📋 Список</button>
+    </div>
+
+    <div id="quizBox">
+      <div class="center meta small" id="qHint">Что это значит?</div>
+      <div class="hz-big" id="qH">…</div>
+      <div class="py" id="qP"></div>
+      <div class="center lvl" id="qLvl"></div>
+      <div class="opts" id="qOpts" style="margin-top:12px"></div>
+      <div class="row-btns" style="margin-top:10px">
+        <button class="ghost" type="button" id="qSay">🔊 Послушать</button>
+        <button class="ghost" type="button" id="qNext">Пропустить →</button>
+      </div>
+    </div>
+
+    <div id="cardsBox" hidden>
+      <div class="flip" id="flip" role="button" tabindex="0" aria-label="Перевернуть карточку">
+        <div class="flip-inner">
+          <div class="face"><small id="cCat"></small><div class="hz-big" id="cH"></div><small>нажмите, чтобы перевернуть</small></div>
+          <div class="face back"><div class="py" id="cP"></div><div class="ru" id="cRu"></div></div>
+        </div>
+      </div>
+      <div class="row-btns" style="margin-top:12px">
+        <button class="ghost" type="button" id="cAgain">😅 Ещё учу</button>
+        <button class="ghost" type="button" id="cSay">🔊</button>
+        <button class="cta" type="button" id="cKnow" style="padding:12px">✅ Знаю</button>
+      </div>
+    </div>
+
+    <div id="listBox" hidden>
+      <ul class="wordlist" id="wordList"></ul>
+    </div>
+    <div class="meta small">Прогресс сохраняется на этом устройстве. В Telegram-боте тот же словарь: команда /learn, там свой прогресс.</div>
+  </section>
+
+  <!-- ===== Игра ===== -->
+  <section class="card" data-tab id="game">
+    <div class="eyebrow">🏯 Мини-игра</div>
+    <h2>Угадай город по иероглифам</h2>
+    <div class="hz-big" id="gH">…</div>
+    <div class="opts" id="gOpts"></div>
+    <div class="row-btns" style="align-items:center">
+      <div class="score">Счёт: <span id="gScore">0</span></div>
+      <div class="meta small" id="gBest" style="text-align:right"></div>
+    </div>
+    <div class="meta small" id="gMsg"></div>
+  </section>
+
+  <!-- ===== Еда ===== -->
+  <section class="card" data-tab id="food">
+    <div class="eyebrow">🍜 Что попробовать</div>
+    <h2>Еда, ради которой стоит лететь</h2>
+    <div class="meta small">Нажмите на блюдо: откроется карточка, которую можно показать официанту.</div>
+    <div class="foods" id="foods"></div>
+  </section>
+
+  <!-- ===== Юани ===== -->
+  <section class="card" data-tab id="yuan">
+    <div class="eyebrow">💴 Юань сегодня</div>
+    <div class="route-line" id="rate">Курс загружается…</div>
+    <div class="conv">
+      <label>Рубли<input id="rub" type="number" inputmode="decimal" value="10000"></label>
+      <span>⇄</span>
+      <label>Юани<input id="cny" type="number" inputmode="decimal"></label>
+    </div>
+    <h2 style="font-size:16px;margin-top:6px">Сколько что стоит (примерно)</h2>
+    <ul class="prices" id="spend"></ul>
+    <h2 style="font-size:16px;margin-top:6px">💰 Бюджет на двоих на месте</h2>
+    <div class="budget">
+      <label>Дней в Китае<input id="bDays" type="number" min="1" max="60" value="14" inputmode="numeric"></label>
+      <label>¥ в день на человека<input id="bDaily" type="number" min="50" step="50" value="400" inputmode="numeric"></label>
+    </div>
+    <div><div class="budget-out" id="bOut">—</div><div class="meta small">Без билетов, на двоих. 400 ¥ в день: отель пополам, еда, транспорт, пара музеев.</div></div>
+  </section>
+
+  <!-- ===== Шпаргалка ===== -->
+  <section class="card" data-tab id="tips">
+    <div class="eyebrow">🧳 Шпаргалка путешественника</div>
+    <div id="tipsBox"></div>
+  </section>
+
+  <!-- ===== Погода ===== -->
+  <section class="card" data-tab id="weather">
+    <div class="eyebrow">🌤 Погода весной</div>
+    <h2>Где будет тепло</h2>
+    <div class="meta small">Средний дневной максимум, °C. Нажмите на месяц, чтобы отсортировать.</div>
+    <div class="wrap-x"><table class="weather" id="wTable"></table></div>
+  </section>
+
+  <!-- ===== Факты ===== -->
+  <section class="card" data-tab id="facts">
+    <div class="eyebrow">🎲 Факт о Китае</div>
+    <div class="fact" id="fact">…</div>
+    <div class="row-btns"><button class="cta alt" type="button" id="nextFact">Ещё факт</button></div>
+    <div class="meta small center" id="factN"></div>
+  </section>
+
+  <p class="foot">Цены в юанях примерные, курс — ЦБ РФ. Погода — многолетние средние, перед поездкой проверьте прогноз.</p>
+</main>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true">
+  <div class="box">
+    <div style="font-size:40px" id="mE"></div>
+    <div class="hz-big" id="mH"></div>
+    <p><i id="mP"></i></p>
+    <p><b id="mRu"></b></p>
+    <p id="mAbout" style="font-size:14px"></p>
+    <div class="row-btns"><button class="ghost" type="button" id="mSay">🔊 Произнести</button><button class="ghost" type="button" id="mClose">Закрыть</button></div>
+  </div>
+</div>
+
+<script src="common.js?v=7"></script>
+<script>
+  const { $, el, rub } = T;
+  let C = { words: [], foods: [], tips: [], facts: [], spend: [], spring: {} };
+  let D = null;
+
+  /* ---------- часы ---------- */
+  function tick() {
+    const f = (tz) => new Date().toLocaleTimeString("ru-RU", { timeZone: tz, hour: "2-digit", minute: "2-digit" });
+    $("bjTime").textContent = f("Asia/Shanghai");
+    $("mskTime").textContent = f("Europe/Moscow");
+  }
+  tick(); setInterval(tick, 20000);
+
+  /* ---------- слова: прогресс на устройстве ---------- */
+  let prog = T.store.get("learn", {});      // id → { l: уровень 0..5, s: показов, c: верных }
+  let streak = 0;
+  let cat = "Все";
+  let mode = "quiz";
+  const lvl = (id) => (prog[id] ? prog[id].l : 0);
+  const dots = (l) => "●".repeat(l) + "○".repeat(5 - l);
+  const pool = () => C.words.filter((w) => cat === "Все" || w.cat === cat);
+  function mark(id, ok) {
+    const p = prog[id] || { l: 0, s: 0, c: 0 };
+    p.l = ok ? Math.min(p.l + 1, 5) : Math.max(p.l - 1, 0);
+    p.s++; if (ok) p.c++;
+    prog[id] = p;
+    T.store.set("learn", prog);
+    streak = ok ? streak + 1 : 0;
+    renderStats();
+  }
+  function renderStats() {
+    const learned = C.words.filter((w) => lvl(w.id) >= 3).length;
+    const seen = Object.values(prog).reduce((a, p) => a + p.s, 0), good = Object.values(prog).reduce((a, p) => a + p.c, 0);
+    $("learned").textContent = learned; $("total").textContent = C.words.length;
+    $("acc").textContent = seen ? Math.round((good / seen) * 100) + "%" : "—";
+    $("streak").textContent = streak + (streak >= 5 ? " 🔥" : "");
+    $("learnBar").style.width = C.words.length ? (learned / C.words.length) * 100 + "%" : "0";
+  }
+  function nextWord() {
+    // сначала слова с низким уровнем, немного случайности
+    const list = pool().map((w) => ({ w, s: lvl(w.id) + Math.random() * 1.5 })).sort((a, b) => a.s - b.s);
+    return list.length ? list[0].w : null;
+  }
+
+  /* квиз */
+  let qWord = null;
+  function quiz() {
+    const w = nextWord();
+    if (!w) return;
+    qWord = w;
+    const reverse = lvl(w.id) >= 2 && Math.random() < 0.5;
+    $("qHint").textContent = reverse ? "Как сказать по-китайски?" : "Что это значит?";
+    $("qH").textContent = reverse ? "«" + w.ru + "»" : w.h;
+    $("qH").style.fontFamily = reverse ? "var(--display)" : "";
+    $("qH").style.fontSize = reverse ? "clamp(22px,7vw,32px)" : "";
+    $("qP").textContent = reverse ? "" : w.p;
+    $("qLvl").textContent = dots(lvl(w.id));
+    const others = C.words.filter((x) => x.id !== w.id).sort(() => Math.random() - .5);
+    const same = others.filter((x) => x.cat === w.cat), rest = others.filter((x) => x.cat !== w.cat);
+    const opts = [w, ...[...same, ...rest].slice(0, 3)].sort(() => Math.random() - .5);
+    const box = $("qOpts");
+    box.textContent = "";
+    opts.forEach((o) => {
+      const b = el("button", "opt");
+      b.type = "button";
+      if (reverse) { b.append(el("span", "h", o.h), el("span", null, o.p)); } else b.textContent = o.ru;
+      b.addEventListener("click", () => {
+        if (box.dataset.done) return;
+        box.dataset.done = "1";
+        const ok = o.id === w.id;
+        b.classList.add(ok ? "good" : "bad");
+        [...box.children].forEach((c, i) => { if (opts[i].id === w.id) c.classList.add("good"); });
+        mark(w.id, ok);
+        $("qLvl").textContent = dots(lvl(w.id)) + (ok ? "  ✅ " + ["Отлично!", "Верно!", "加油！", "Супер!"][Math.floor(Math.random() * 4)] : "  ❌ " + w.h + " — " + w.ru);
+        if (reverse) { $("qP").textContent = w.p; }
+        if (ok) T.speak(w.h);
+        setTimeout(() => { delete box.dataset.done; quiz(); }, ok ? 1100 : 2400);
+      });
+      box.appendChild(b);
+    });
+  }
+  $("qSay").addEventListener("click", () => qWord && T.speak(qWord.h));
+  $("qNext").addEventListener("click", quiz);
+
+  /* карточки */
+  let cWord = null;
+  function card() {
+    cWord = nextWord();
+    if (!cWord) return;
+    $("flip").classList.remove("on");
+    setTimeout(() => {
+      $("cCat").textContent = cWord.cat + " · " + dots(lvl(cWord.id));
+      $("cH").textContent = cWord.h; $("cP").textContent = cWord.p; $("cRu").textContent = cWord.ru;
+    }, 150);
+  }
+  const flip = () => { $("flip").classList.toggle("on"); if ($("flip").classList.contains("on")) T.speak(cWord.h); };
+  $("flip").addEventListener("click", flip);
+  $("flip").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); flip(); } });
+  $("cKnow").addEventListener("click", () => { mark(cWord.id, true); card(); });
+  $("cAgain").addEventListener("click", () => { mark(cWord.id, false); card(); });
+  $("cSay").addEventListener("click", () => cWord && T.speak(cWord.h));
+
+  /* список */
+  function list() {
+    const ul = $("wordList");
+    ul.textContent = "";
+    pool().forEach((w) => {
+      const li = el("li");
+      const say = el("button", null, "🔊"); say.type = "button"; say.setAttribute("aria-label", "Произнести " + w.ru);
+      say.addEventListener("click", () => T.speak(w.h));
+      const mid = el("span"); mid.append(el("span", null, w.ru + " · "), el("i", "muted", w.p));
+      const left = el("span"); left.append(el("span", "h", w.h));
+      li.append(left, mid, say);
+      ul.appendChild(li);
+    });
+  }
+
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll("[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
+    $("quizBox").hidden = m !== "quiz"; $("cardsBox").hidden = m !== "cards"; $("listBox").hidden = m !== "list";
+    if (m === "quiz") quiz(); else if (m === "cards") card(); else list();
+  }
+  document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+  function renderCats() {
+    const box = $("catChips");
+    box.textContent = "";
+    ["Все", ...new Set(C.words.map((w) => w.cat))].forEach((c) => {
+      const b = el("button", "chip", c); b.type = "button";
+      b.setAttribute("aria-pressed", String(c === cat));
+      b.addEventListener("click", () => { cat = c; renderCats(); setMode(mode); });
+      box.appendChild(b);
+    });
+  }
+
+  /* ---------- игра: угадай город ---------- */
+  let gScore = 0, gBest = T.store.get("cityBest", 0);
+  function game() {
+    const cities = (D && D.cities) || [];
+    if (cities.length < 4) return;
+    const c = cities[Math.floor(Math.random() * cities.length)];
+    $("gH").textContent = c.hanzi;
+    const opts = [c, ...cities.filter((x) => x.code !== c.code).sort(() => Math.random() - .5).slice(0, 3)].sort(() => Math.random() - .5);
+    const box = $("gOpts");
+    box.textContent = "";
+    opts.forEach((o) => {
+      const b = el("button", "opt", o.name); b.type = "button";
+      b.addEventListener("click", () => {
+        if (box.dataset.done) return;
+        box.dataset.done = "1";
+        const ok = o.code === c.code;
+        b.classList.add(ok ? "good" : "bad");
+        [...box.children].forEach((x, i) => { if (opts[i].code === c.code) x.classList.add("good"); });
+        gScore = ok ? gScore + 1 : 0;
+        if (gScore > gBest) { gBest = gScore; T.store.set("cityBest", gBest); }
+        $("gScore").textContent = gScore;
+        $("gBest").textContent = "Рекорд: " + gBest;
+        $("gMsg").textContent = ok ? "✅ " + c.name + " — " + c.vibe : "❌ Это " + c.name + " (" + c.hanzi + "). Счёт обнулился.";
+        T.speak(c.hanzi);
+        setTimeout(() => { delete box.dataset.done; game(); }, ok ? 1100 : 2200);
+      });
+      box.appendChild(b);
+    });
+    $("gBest").textContent = "Рекорд: " + gBest;
+  }
+
+  /* ---------- еда ---------- */
+  function foods() {
+    const box = $("foods");
+    box.textContent = "";
+    C.foods.forEach((f) => {
+      const b = el("button", "food"); b.type = "button";
+      b.append(el("span", "e", f.e), el("span", "n", f.ru), el("span", "h", f.h));
+      b.addEventListener("click", () => {
+        $("mE").textContent = f.e; $("mH").textContent = f.h; $("mP").textContent = f.p; $("mRu").textContent = f.ru; $("mAbout").textContent = f.about;
+        $("modal").hidden = false;
+        $("mSay").onclick = () => T.speak(f.h);
+      });
+      box.appendChild(b);
+    });
+  }
+  $("mClose").addEventListener("click", () => { $("modal").hidden = true; });
+  $("modal").addEventListener("click", (e) => { if (e.target === $("modal")) $("modal").hidden = true; });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("modal").hidden = true; });
+
+  /* ---------- юани ---------- */
+  function yuan() {
+    const r = D && D.cny;
+    if (!r) { $("rate").textContent = "Курс появится после обновления цен"; return; }
+    $("rate").textContent = "1 ¥ = " + r.toLocaleString("ru-RU", { maximumFractionDigits: 2 }) + " ₽ · 100 ¥ ≈ " + rub(100 * r);
+    const ul = $("spend");
+    ul.textContent = "";
+    C.spend.forEach(([e, name, y]) => { const li = el("li"); li.append(el("span", null, e + " " + name), el("b", null, y + " ¥ ≈ " + rub(y * r))); ul.appendChild(li); });
+    sync("rub"); budget();
+  }
+  function sync(from) {
+    const r = D && D.cny; if (!r) return;
+    if (from === "rub") { const v = parseFloat($("rub").value); $("cny").value = Number.isFinite(v) ? Math.round(v / r) : ""; }
+    else { const v = parseFloat($("cny").value); $("rub").value = Number.isFinite(v) ? Math.round(v * r) : ""; }
+  }
+  function budget() {
+    const r = D && D.cny; if (!r) return;
+    const days = parseInt($("bDays").value, 10) || 0, daily = parseInt($("bDaily").value, 10) || 0;
+    const y = days * daily * 2;
+    $("bOut").textContent = y.toLocaleString("ru-RU") + " ¥ ≈ " + rub(y * r);
+  }
+  $("rub").addEventListener("input", () => sync("rub"));
+  $("cny").addEventListener("input", () => sync("cny"));
+  $("bDays").addEventListener("input", budget);
+  $("bDaily").addEventListener("input", budget);
+
+  /* ---------- шпаргалка ---------- */
+  function tips() {
+    const box = $("tipsBox");
+    box.textContent = "";
+    C.tips.forEach((t, i) => {
+      const d = el("details"); if (i < 2) d.open = true;
+      const s = el("summary"); s.append(el("span", null, t.e), el("span", null, t.t));
+      d.append(s, el("p", null, t.text));
+      box.appendChild(d);
+    });
+  }
+
+  /* ---------- погода ---------- */
+  let wSort = 1;
+  function weather() {
+    const t = $("wTable");
+    t.textContent = "";
+    const cities = ((D && D.cities) || []).filter((c) => C.spring[c.code]);
+    const head = el("tr");
+    ["Город", "Март", "Апрель", "Май"].forEach((h, i) => {
+      const th = el("th", null, h + (i && wSort === i - 1 ? " ↓" : ""));
+      if (i) th.addEventListener("click", () => { wSort = i - 1; weather(); });
+      head.appendChild(th);
+    });
+    t.appendChild(head);
+    const color = (v) => `hsl(${Math.max(0, Math.min(220, 220 - v * 7))} 80% ${v > 28 ? 62 : 70}%)`;
+    cities.sort((a, b) => C.spring[b.code][wSort] - C.spring[a.code][wSort]).forEach((c) => {
+      const tr = el("tr");
+      tr.appendChild(el("td", null, c.name));
+      C.spring[c.code].forEach((v) => {
+        const td = el("td", "t"), s = el("span", "temp", v + "°");
+        s.style.background = color(v);
+        td.appendChild(s); tr.appendChild(td);
+      });
+      t.appendChild(tr);
+    });
+  }
+
+  /* ---------- факты ---------- */
+  let fIdx = Math.floor(Math.random() * 100);
+  function fact() {
+    if (!C.facts.length) return;
+    fIdx = (fIdx + 1) % C.facts.length;
+    const f = $("fact");
+    f.textContent = C.facts[fIdx];
+    f.style.animation = "none"; void f.offsetWidth; f.style.animation = "";
+    $("factN").textContent = (fIdx + 1) + " / " + C.facts.length;
+  }
+  $("nextFact").addEventListener("click", fact);
+
+  /* ---------- старт ---------- */
+  Promise.all([T.content(), T.blob("data")]).then(([c, d]) => {
+    C = Object.assign(C, c || {});
+    D = d;
+    renderCats(); renderStats(); setMode("quiz");
+    game(); foods(); yuan(); tips(); weather(); fact();
+  });
+</script>
+</body>
+</html>

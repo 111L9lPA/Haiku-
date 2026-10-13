@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Golos+Text:wght@400;600&family=Ma+Shan+Zheng&display=swap">
-  <link rel="stylesheet" href="common.css?v=6">
+  <link rel="stylesheet" href="common.css?v=7">
   <style>
     body { padding-block: 20px 56px; }
     .back { color: var(--gold); text-decoration: none; font-size: 14px; }
@@ -54,7 +54,7 @@
   <header>
     <a class="back" href="./">← Китай-радар</a>
     <h1>Календарь цен <span class="cn">中国</span></h1>
-    <p class="sub">Все билеты туда-обратно в ноябре и декабре: из Москвы и Краснодара во все города Китая. Только поездки от 12 дней. Ищите, когда и куда дешевле.</p>
+    <p class="sub" id="sub">Все билеты туда-обратно за сезон: из Москвы и Краснодара во все города Китая. Ищите, когда и куда дешевле.</p>
     <div class="refresh-row">
       <button class="ghost" id="refresh" type="button">🔄 Обновить цены</button>
       <div class="fresh" id="fresh" role="status"></div>
@@ -88,10 +88,8 @@
     <div class="group">
       <div class="label">Когда</div>
       <div class="chips" id="monthChips">
-        <button class="chip" type="button" data-month="all" aria-pressed="true">Ноябрь и декабрь</button>
-        <button class="chip" type="button" data-month="2026-11" aria-pressed="false">Ноябрь</button>
-        <button class="chip" type="button" data-month="2026-12" aria-pressed="false">Декабрь</button>
-        <button class="chip" type="button" id="planChip" aria-pressed="false">🎯 Наши даты</button>
+        <button class="chip" type="button" data-month="all" aria-pressed="true">Весь сезон</button>
+        <button class="chip" type="button" id="planChip" aria-pressed="false" hidden>🎯 Наши даты</button>
       </div>
     </div>
     <div class="group">
@@ -132,7 +130,7 @@
   <p class="foot">Цены из кэша Aviasales и могут измениться при покупке. Обновляются сами раз в 4 часа или по кнопке.</p>
 </main>
 
-<script src="common.js?v=6"></script>
+<script src="common.js?v=7"></script>
 <script>
   const { $, el, rub } = T;
   const PAGE = 25;
@@ -236,7 +234,7 @@
     });
     const vals = Object.values(minByDay);
     const lo = Math.min(...vals), hi = Math.max(...vals);
-    ["2026-11", "2026-12"].filter((m) => st.month === "all" || m === st.month).forEach((ym) => {
+    (meta.season_months || []).filter((m) => st.month === "all" || m === st.month).forEach((ym) => {
       const [Y, M] = ym.split("-").map(Number);
       const wrap = el("div");
       wrap.appendChild(el("div", "month-title", new Date(Y, M - 1, 1).toLocaleDateString("ru-RU", { month: "long", year: "numeric" })));
@@ -311,11 +309,30 @@
 
   /* ---------- управление ---------- */
   document.querySelectorAll("#fromSeg button").forEach((b) => b.addEventListener("click", () => { st.from = b.dataset.o; T.store.set("origin", st.from); st.day = null; st.shown = PAGE; renderAll(); }));
-  document.querySelectorAll("[data-month]").forEach((b) => b.addEventListener("click", () => { st.month = b.dataset.month; st.plan = false; st.day = null; st.shown = PAGE; renderAll(); }));
+  function bindMonth(b) { b.addEventListener("click", () => { st.month = b.dataset.month; st.plan = false; st.day = null; st.shown = PAGE; renderAll(); }); }
+  document.querySelectorAll("[data-month]").forEach(bindMonth);
+  let monthsBuilt = "";
+  function buildMonths() {
+    const months = meta.season_months || [];
+    if (monthsBuilt === months.join()) return;
+    monthsBuilt = months.join();
+    document.querySelectorAll("[data-month]:not([data-month=all])").forEach((b) => b.remove());
+    const planChip = $("planChip");
+    if (months.length > 1) months.forEach((m) => {
+      const b = el("button", "chip", T.MONTHS[+m.slice(5, 7) - 1][0].toUpperCase() + T.MONTHS[+m.slice(5, 7) - 1].slice(1));
+      b.type = "button"; b.dataset.month = m;
+      planChip.before(b); bindMonth(b);
+    });
+    if (st.month !== "all" && !months.includes(st.month)) st.month = "all";
+    planChip.hidden = !meta.plan_window;
+    if (!meta.plan_window) st.plan = false;
+    $("sub").textContent = "Все билеты туда-обратно за " + (meta.season_label || "сезон") + ": из Москвы и Краснодара во все города Китая, поездки от " + (meta.min_nights || 12) + " дней. Ищите, когда и куда дешевле.";
+    if (!st.minTouched) { st.min = meta.min_nights || 12; $("minDays").value = st.min; }
+  }
   $("planChip").addEventListener("click", () => { st.plan = !st.plan; st.month = "all"; st.day = null; st.shown = PAGE; renderAll(); });
   $("direct").addEventListener("click", () => { st.direct = !st.direct; st.shown = PAGE; renderAll(); });
   const numInput = (id, key, fallback) => $(id).addEventListener("input", () => { const v = parseInt($(id).value, 10); st[key] = Number.isFinite(v) ? v : fallback; st.shown = PAGE; renderAll(); });
-  numInput("minDays", "min", 1); numInput("maxDays", "max", 60);
+  numInput("minDays", "min", 1); $("minDays").addEventListener("input", () => { st.minTouched = true; }); numInput("maxDays", "max", 60);
   $("sort").addEventListener("change", () => { st.sort = $("sort").value; st.shown = PAGE; renderList(); });
   $("clearDay").addEventListener("click", () => { st.day = null; renderAll(); });
   $("more").addEventListener("click", () => { st.shown += PAGE; renderList(); });
@@ -323,6 +340,7 @@
   function load() {
     return Promise.all([T.blob("prices"), T.blob("history"), T.blob("data")]).then(([p, h, d]) => {
       if (d && d.cities) meta = d;
+      buildMonths();
       items = p && p.items ? p.items.filter((i) => i.o && i.x) : [];
       points = h && h.points ? h.points.filter((x) => x.c) : [];
       fresh.set(p && p.generated);

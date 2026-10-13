@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Golos+Text:wght@400;600&family=Ma+Shan+Zheng&display=swap">
-  <link rel="stylesheet" href="common.css?v=6">
+  <link rel="stylesheet" href="common.css?v=7">
   <style>
     /* ---------- герой ---------- */
     .hero { position: relative; margin-inline: -16px; aspect-ratio: 1 / 1; max-height: 80vh; overflow: hidden; border-radius: 0 0 28px 28px; isolation: isolate; }
@@ -33,6 +33,20 @@
     .count b { font-family: var(--display); font-size: clamp(54px, 18vw, 84px); font-weight: 800; line-height: .95; font-variant-numeric: tabular-nums; }
     .count span { font-size: 16px; color: var(--muted); line-height: 1.25; }
     .count em { display: block; font-style: normal; color: var(--gold); font-weight: 600; }
+
+    /* ---------- когда летим ---------- */
+    .season-sum { display: flex; flex-direction: column; gap: 6px; }
+    .season-sum b { font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: -.01em; text-transform: capitalize; }
+    .editor { display: flex; flex-direction: column; gap: 16px; padding-top: 4px; }
+    .editor[hidden] { display: none; }
+    .months { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+    .months button { font: inherit; font-size: 13px; padding: 10px 4px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; text-transform: capitalize; transition: all .15s; }
+    .months button.in { background: rgba(244,185,66,.18); color: var(--paper); border-color: rgba(244,185,66,.5); }
+    .months button.edge { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight: 600; }
+    .dates { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .dates label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
+    .dates input { width: 100%; color-scheme: dark; }
+    .hint { font-size: 13px; color: var(--muted); line-height: 1.45; }
 
     /* ---------- карточки цен ---------- */
     .plan::before { content: ""; position: absolute; width: 280px; height: 280px; right: -100px; top: -130px; border-radius: 50%; background: radial-gradient(circle, rgba(244,185,66,.26), transparent 65%); pointer-events: none; }
@@ -59,7 +73,7 @@
     }
     .city:hover { transform: translateY(-3px); border-color: rgba(244,185,66,.55); }
     .city .hz { position: absolute; right: -6px; bottom: -14px; font-family: var(--brush); font-size: 74px; line-height: 1; color: rgba(244,185,66,.1); pointer-events: none; white-space: nowrap; }
-    .city .rank { font-family: var(--display); font-size: 11px; color: var(--muted); }
+    .city .rank { display: flex; justify-content: space-between; gap: 6px; font-family: var(--display); font-size: 11px; color: var(--muted); }
     .city .name { font-family: var(--display); font-weight: 800; font-size: 16px; letter-spacing: -.01em; }
     .city .vibe { font-size: 12px; color: var(--muted); line-height: 1.3; }
     .city .price { margin-top: auto; padding-top: 8px; font-family: var(--display); font-weight: 800; font-size: 19px; font-variant-numeric: tabular-nums; }
@@ -67,6 +81,14 @@
     .city.top { border-color: rgba(244,185,66,.7); background: linear-gradient(160deg, #2e2214, var(--ink-2)); }
     .city.top .hz { color: rgba(244,185,66,.2); }
     .nodata { font-size: 13px; color: var(--muted); line-height: 1.5; padding-inline: 4px; }
+
+    /* ---------- Китай для нас ---------- */
+    .portal { text-decoration: none; color: var(--paper); background: linear-gradient(135deg, #3a1216, #1d1530 70%); border-color: rgba(224,55,47,.45); overflow: hidden; }
+    .portal .big-hz { position: absolute; right: -10px; top: -20px; font-family: var(--brush); font-size: 150px; line-height: 1; color: rgba(244,185,66,.12); pointer-events: none; }
+    .portal h2 { font-size: 24px; }
+    .portal .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .portal .tags span { font-size: 13px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.07); border: 1px solid var(--line); }
+    .portal:hover { border-color: var(--gold); }
 
     /* ---------- весёлый блок ---------- */
     .fun { display: grid; grid-template-columns: 1fr; gap: 20px; }
@@ -77,9 +99,6 @@
     .conv label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
     .conv input { width: 100%; font-size: 17px; font-variant-numeric: tabular-nums; }
     .conv span { color: var(--muted); padding-top: 18px; }
-    .prices { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 6px; }
-    .prices li { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; padding: 6px 0; border-top: 1px solid var(--line); }
-    .prices li b { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
     /* ---------- сборы ---------- */
     .todo-form { display: flex; gap: 8px; }
@@ -115,6 +134,38 @@
     </div>
   </header>
 
+  <section class="card" id="season">
+    <div class="plan-top">
+      <div class="eyebrow">📅 Когда летим</div>
+      <button class="ghost" id="editSeason" type="button">Изменить</button>
+    </div>
+    <div class="season-sum">
+      <b id="seasonLabel">…</b>
+      <div class="meta" id="seasonMeta"></div>
+    </div>
+    <form class="editor" id="seasonForm" hidden>
+      <div>
+        <div class="label hint" style="margin-bottom:8px">Сезон поиска: нажмите первый и последний месяц (до 4 месяцев)</div>
+        <div class="months" id="monthGrid"></div>
+      </div>
+      <div>
+        <div class="hint" style="margin-bottom:8px">🎯 Наши даты (если уже знаете примерно). Можно оставить пустыми.</div>
+        <div class="dates">
+          <label>Вылет с<input type="date" id="df"></label>
+          <label>Вылет по<input type="date" id="dt"></label>
+          <label>Обратно с<input type="date" id="rf"></label>
+          <label>Обратно по<input type="date" id="rt"></label>
+        </div>
+      </div>
+      <label class="field" style="display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px">Поездка от <input class="num" id="minN" type="number" min="1" max="60" value="12" inputmode="numeric" style="width:74px;text-align:center"> дней</label>
+      <div class="row-btns">
+        <button class="cta" type="submit" id="saveSeason">Сохранить и найти цены</button>
+        <button class="ghost" type="button" id="cancelSeason">Отмена</button>
+      </div>
+      <div class="hint" id="seasonNote"></div>
+    </form>
+  </section>
+
   <div class="segment" role="group" aria-label="Откуда летим" id="originSwitch">
     <button type="button" data-o="all" aria-pressed="true">Оба города</button>
     <button type="button" data-o="MOW" aria-pressed="false">Москва</button>
@@ -123,7 +174,7 @@
 
   <section class="card plan" aria-live="polite">
     <div class="plan-top">
-      <div class="eyebrow" id="planTitle">Наши даты</div>
+      <div class="eyebrow" id="planTitle">🎯 Наши даты</div>
       <div class="trend" id="planTrend"></div>
     </div>
     <div class="big" id="planPrice">…</div>
@@ -139,7 +190,7 @@
 
   <section class="card wild" style="animation-delay:.1s">
     <div class="eyebrow" style="color:var(--red-hot)">🔥 Самый дешёвый билет в Китай</div>
-    <div class="meta small">Любой город, любые даты ноября и декабря, от 12 дней в Китае</div>
+    <div class="meta small" id="wildSub">Любой город, любые даты сезона</div>
     <div class="big" id="wildPrice" style="font-size:clamp(32px,10vw,46px)">…</div>
     <div class="route-line" id="wildRoute"></div>
     <div class="meta" id="wildMeta"></div>
@@ -152,7 +203,7 @@
   <section id="cities">
     <div class="section-head">
       <h2>Куда дешевле всего</h2>
-      <p>Минимальная цена туда-обратно в ноябре и декабре, поездки от 12 дней. Нажмите на город, чтобы увидеть все даты.</p>
+      <p id="citiesSub">Минимальная цена туда-обратно за сезон. Нажмите на город, чтобы увидеть все даты.</p>
     </div>
     <div class="cities" id="cityGrid" style="margin-top:14px"></div>
     <button class="ghost" id="allCities" type="button" hidden style="display:block;margin:14px auto 0">Показать все города</button>
@@ -169,6 +220,13 @@
       <div class="fresh" id="fresh" role="status"></div>
     </div>
   </section>
+
+  <a class="card portal" href="china.html">
+    <span class="big-hz" aria-hidden="true">学</span>
+    <div class="eyebrow">Китай для нас</div>
+    <h2>Учим китайский и готовимся к поездке →</h2>
+    <div class="tags"><span>🀄 64 слова для поездки</span><span>🎮 Квиз</span><span>🍜 Что поесть</span><span>💴 Юани</span><span>🧳 Шпаргалка</span><span>🌤 Погода</span><span>🏯 Угадай город</span></div>
+  </a>
 
   <div class="fun">
     <section class="card">
@@ -190,7 +248,7 @@
         <span>⇄</span>
         <label>Юани<input id="cny" type="number" inputmode="decimal"></label>
       </div>
-      <ul class="prices" id="cnyPrices"></ul>
+      <a class="ghost" href="china.html#yuan" style="text-align:center;text-decoration:none">Сколько что стоит в Китае →</a>
     </section>
   </div>
 
@@ -210,15 +268,14 @@
   </section>
 
   <p class="foot">Цены из кэша Aviasales: перед покупкой они могут измениться. Обновляются сами раз в 4 часа или по кнопке.<br>
-    Бот в Telegram: /top, /update, /bought, /phrase. Позовите друга: пусть напишет боту /start.</p>
+    Бот в Telegram каждый день в 16:00 присылает итоги. Команды: /prices, /learn, /yuan, /food, /fact. Позовите друга: пусть напишет боту /start.</p>
 </main>
 
-<script src="common.js?v=6"></script>
+<script src="common.js?v=7"></script>
 <script>
   const { $, el, rub } = T;
-  let D = null;
+  let D = null, C = null;
   let origin = T.store.get("origin", "all");
-  let phrases = [];
   let phraseIdx = 0;
   let bought = false;
   let showAllCities = false;
@@ -249,21 +306,42 @@
     const left = Math.max(Math.ceil((T.dt(d.trip_start) - new Date()) / 864e5), 0);
     T.countUp($("days"), left, String);
     $("daysLabel").firstChild.textContent = T.plural(left, "день", "дня", "дней") + " до вылета";
-    $("tripDate").textContent = T.dm(d.trip_start);
-    renderPlan(); renderWild(); renderCities(); renderYuan();
+    $("tripDate").textContent = (d.plan_window ? "" : "≈ ") + T.dm(d.trip_start);
+    renderSeason(); renderPlan(); renderWild(); renderCities(); renderYuan();
+  }
+
+  function renderSeason() {
+    const s = D.settings || {};
+    $("seasonLabel").textContent = D.season_label || "";
+    const parts = [];
+    parts.push(D.plan_window ? "🎯 Наши даты: " + T.span(D.plan_window.depart_from, D.plan_window.depart_to) + " → " + T.span(D.plan_window.return_from, D.plan_window.return_to) : "🎯 Точные даты пока не выбраны");
+    parts.push("⏱ Поездки от " + (D.min_nights || s.min_nights || 12) + " дней · вылет из Москвы и Краснодара");
+    $("seasonMeta").textContent = parts.join("\n");
+    $("seasonMeta").style.whiteSpace = "pre-line";
+    $("wildSub").textContent = "Любой город, любые даты сезона (" + D.season_label + "), от " + D.min_nights + " дней";
+    $("citiesSub").textContent = "Минимальная цена туда-обратно за " + D.season_label + ", поездки от " + D.min_nights + " дней. Нажмите на город, чтобы увидеть все даты.";
   }
 
   function renderPlan() {
     const pw = D.plan_window;
-    $("planTitle").textContent = "🎯 Наши даты · " + T.dt(pw.depart_from).getDate() + "–" + T.dm(pw.depart_to) + " → " + T.dt(pw.return_from).getDate() + "–" + T.dm(pw.return_to);
-    const list = byOrigin(D.plan || []);
     const more = $("planMore");
     more.textContent = "";
+    $("planLink").hidden = true;
+    if (!pw) {
+      $("planTitle").textContent = "🎯 Наши даты";
+      $("planPrice").textContent = "Выберите даты";
+      $("planRoute").textContent = "";
+      $("planMeta").textContent = "Когда будете знать примерные даты вылета и возврата, укажите их в блоке «Когда летим». Бот будет следить за ними отдельно. Пока ниже лучшие цены за весь сезон.";
+      $("planTrend").textContent = "";
+      $("planSpark").hidden = true; $("sparkNote").textContent = "";
+      return;
+    }
+    $("planTitle").textContent = "🎯 Наши даты · " + T.span(pw.depart_from, pw.depart_to) + " → " + T.span(pw.return_from, pw.return_to);
+    const list = byOrigin(D.plan || []);
     if (!list.length) {
       $("planPrice").textContent = "Пока нет";
       $("planRoute").textContent = "";
-      $("planMeta").textContent = origin === "KRR" ? "Из Краснодара на наши даты вариантов пока не нашлось. Попробуйте «Оба города»." : "На эти даты цен пока не нашлось. Загляните в календарь: там все даты ноября и декабря.";
-      $("planLink").hidden = true;
+      $("planMeta").textContent = "На эти даты цен пока не нашлось. Если до вылета больше полугода, продажи могут быть ещё не открыты. Загляните в календарь.";
     } else {
       const b = list[0];
       T.countUp($("planPrice"), b.p, rub);
@@ -288,8 +366,10 @@
   function renderWild() {
     const b = byOrigin(D.board || [])[0];
     if (!b) {
-      $("wildPrice").textContent = "Пока нет";
-      $("wildRoute").textContent = ""; $("wildMeta").textContent = "Цен для этого города вылета не нашлось."; $("wildLink").hidden = true;
+      $("wildPrice").textContent = "Пока нет цен";
+      $("wildRoute").textContent = "";
+      $("wildMeta").textContent = "На этот сезон цен в кэше Aviasales пока нет: продажи открываются примерно за 6–11 месяцев. Радар проверяет каждые 4 часа и сообщит в Telegram.";
+      $("wildLink").hidden = true;
       return;
     }
     T.countUp($("wildPrice"), b.p, rub);
@@ -308,35 +388,93 @@
     const btn = $("allCities");
     btn.hidden = ranked.length <= 8;
     btn.textContent = showAllCities ? "Свернуть" : "Показать все города (" + ranked.length + ")";
+    const m = D.season_months && D.season_months[0] ? +D.season_months[0].slice(5, 7) : 0;
     ranked.slice(0, showAllCities ? ranked.length : 8).forEach((i, n) => {
       const c = cityOf(i.x);
       const a = el("a", "city" + (n === 0 ? " top" : ""));
       a.href = "search.html?city=" + i.x + (origin !== "all" ? "&from=" + origin : "");
       a.style.setProperty("--i", n);
-      a.append(el("span", "hz", c.hanzi), el("span", "rank", n === 0 ? "🏆 дешевле всех" : "#" + (n + 1)),
-        el("span", "name", c.name), el("span", "vibe", c.vibe), el("span", "price", "от " + rub(i.p)),
+      const temp = C && C.spring && C.spring[i.x] && m >= 3 && m <= 5 ? "☀️ " + C.spring[i.x][m - 3] + "°" : "";
+      const rank = el("span", "rank");
+      rank.append(el("span", null, n === 0 ? "🏆 дешевле всех" : "#" + (n + 1)), el("span", null, temp));
+      a.append(el("span", "hz", c.hanzi), rank, el("span", "name", c.name), el("span", "vibe", c.vibe), el("span", "price", "от " + rub(i.p)),
         el("span", "when", T.short(i.d) + " → " + T.short(i.r) + " · " + originOf(i.o).from));
       grid.appendChild(a);
     });
     const missing = D.cities.filter((c) => !best[c.code]).map((c) => c.name);
-    $("noData").textContent = missing.length ? "Без цен сейчас: " + missing.join(", ") + "." : "";
+    $("noData").textContent = !ranked.length ? "" : missing.length ? "Без цен сейчас: " + missing.join(", ") + "." : "";
   }
-
   $("allCities").addEventListener("click", () => { showAllCities = !showAllCities; renderCities(); });
 
+  /* ---------- когда летим: редактор ---------- */
+  let pickFrom = null, pickTo = null, picking = false;
+  const ymOf = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+  function monthsAhead() {
+    const out = [], d = new Date(); d.setDate(1);
+    for (let i = 0; i < 12; i++) { out.push(ymOf(d)); d.setMonth(d.getMonth() + 1); }
+    return out;
+  }
+  function paintMonths() {
+    const grid = $("monthGrid");
+    grid.textContent = "";
+    monthsAhead().forEach((ym) => {
+      const b = el("button", null, T.MONTHS[+ym.slice(5, 7) - 1].slice(0, 3) + " " + ym.slice(2, 4));
+      b.type = "button";
+      if (pickFrom && pickTo && ym >= pickFrom && ym <= pickTo) b.className = "in";
+      if (ym === pickFrom || ym === pickTo) b.className = "edge";
+      b.addEventListener("click", () => {
+        if (!picking || !pickFrom || ym < pickFrom) { pickFrom = ym; pickTo = ym; picking = true; }
+        else {
+          const months = monthsAhead();
+          const span = months.indexOf(ym) - months.indexOf(pickFrom);
+          pickTo = span > 3 ? months[months.indexOf(pickFrom) + 3] : ym;
+          picking = false;
+        }
+        paintMonths();
+        $("seasonNote").textContent = "Сезон: " + T.monthLabel(pickFrom) + (pickTo !== pickFrom ? " – " + T.monthLabel(pickTo) : "");
+      });
+      grid.appendChild(b);
+    });
+  }
+  function openEditor() {
+    const s = (D && D.settings) || {};
+    pickFrom = s.season_from || "2027-03"; pickTo = s.season_to || "2027-05"; picking = false;
+    const p = s.plan || {};
+    $("df").value = p.depart_from || ""; $("dt").value = p.depart_to || ""; $("rf").value = p.return_from || ""; $("rt").value = p.return_to || "";
+    $("minN").value = s.min_nights || 12;
+    $("seasonNote").textContent = "";
+    paintMonths();
+    $("seasonForm").hidden = false;
+    $("editSeason").hidden = true;
+  }
+  $("editSeason").addEventListener("click", openEditor);
+  $("cancelSeason").addEventListener("click", () => { $("seasonForm").hidden = true; $("editSeason").hidden = false; });
+  $("seasonForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const dates = ["df", "dt", "rf", "rt"].map((id) => $(id).value);
+    const filled = dates.filter(Boolean).length;
+    let plan = null;
+    if (filled) {
+      const [df, dt, rf, rt] = dates;
+      if (filled < 4) { $("seasonNote").textContent = "Заполните все четыре даты или оставьте их пустыми."; return; }
+      if (dt < df || rt < rf || rf <= df) { $("seasonNote").textContent = "Проверьте даты: «по» должно быть не раньше «с», а возвращение позже вылета."; return; }
+      plan = { depart_from: df, depart_to: dt, return_from: rf, return_to: rt };
+    }
+    const s = { season_from: pickFrom, season_to: pickTo, plan, min_nights: Math.min(Math.max(parseInt($("minN").value, 10) || 12, 1), 60) };
+    $("saveSeason").disabled = true;
+    $("seasonNote").textContent = "Сохраняю…";
+    T.saveSettings(s).then(() => {
+      $("seasonForm").hidden = true; $("editSeason").hidden = false; $("saveSeason").disabled = false;
+      $("seasonLabel").textContent = T.monthLabel(s.season_from) + (s.season_to !== s.season_from ? " – " + T.monthLabel(s.season_to) : "");
+      requestRefresh();
+    }).catch(() => { $("saveSeason").disabled = false; $("seasonNote").textContent = "Не удалось сохранить. Попробуйте ещё раз."; });
+  });
+
   /* ---------- юань ---------- */
-  const SPEND = [["🍜", "Миска лапши", 25], ["🧋", "Бабл-ти", 18], ["☕", "Кофе", 30], ["🍺", "Пиво в баре", 25], ["🚇", "Поездка в метро", 4], ["🦆", "Пекинская утка", 260], ["🏯", "Билет в Запретный город", 60], ["🚄", "Скоростной поезд Пекин–Шанхай", 670]];
   function renderYuan() {
     const r = D.cny;
     if (!r) return;
     $("rate").textContent = "1 ¥ = " + r.toLocaleString("ru-RU", { maximumFractionDigits: 2 }) + " ₽";
-    const ul = $("cnyPrices");
-    ul.textContent = "";
-    SPEND.forEach(([e, name, y]) => {
-      const li = el("li");
-      li.append(el("span", null, e + " " + name), el("b", null, y + " ¥ ≈ " + rub(y * r)));
-      ul.appendChild(li);
-    });
     syncCny("rub");
   }
   function syncCny(from) {
@@ -350,8 +488,9 @@
 
   /* ---------- фраза дня ---------- */
   function showPhrase() {
-    if (!phrases.length) return;
-    const p = phrases[phraseIdx % phrases.length];
+    const list = (C && C.phrases) || [];
+    if (!list.length) return;
+    const p = list[phraseIdx % list.length];
     const h = $("hanzi");
     h.textContent = p.h;
     h.style.animation = "none"; void h.offsetWidth; h.style.animation = "";
@@ -361,13 +500,7 @@
   $("nextPhrase").addEventListener("click", () => { phraseIdx++; showPhrase(); });
   if ("speechSynthesis" in window) {
     $("say").hidden = false;
-    $("say").addEventListener("click", () => {
-      const u = new SpeechSynthesisUtterance($("hanzi").textContent);
-      u.lang = "zh-CN"; u.rate = .8;
-      const v = speechSynthesis.getVoices().find((x) => /zh/i.test(x.lang));
-      if (v) u.voice = v;
-      speechSynthesis.cancel(); speechSynthesis.speak(u);
-    });
+    $("say").addEventListener("click", () => T.speak($("hanzi").textContent));
   }
 
   /* ---------- билет куплен ---------- */
@@ -397,7 +530,7 @@
     return fetch(TODO + "?select=id,text,done&order=done.asc,created_at.asc", { headers: T.H })
       .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
       .then((rows) => { todos = rows; $("todoNote").textContent = ""; renderTodos(); })
-      .catch(() => { $("todoNote").textContent = "Список заработает после SQL в Supabase (одна вставка, инструкция в чате)."; renderTodos(); });
+      .catch(() => { $("todoNote").textContent = "Список не загрузился. Обновите страницу."; renderTodos(); });
   }
   function renderTodos() {
     const ul = $("todos");
@@ -433,17 +566,24 @@
 
   /* ---------- старт ---------- */
   setOrigin(origin);
-  Promise.all([T.blob("data"), T.json("phrases.json")]).then(([d, p]) => {
-    phrases = p || [];
+  Promise.all([T.blob("data"), T.content()]).then(([d, c]) => {
+    C = c || {};
     phraseIdx = Math.floor(Date.now() / 864e5) + 719163;  // тот же номер дня, что у бота
     showPhrase();
-    if (d && d.cities) render(d);
-    else { $("planPrice").textContent = "Скоро"; $("planMeta").textContent = "Первые цены по всему Китаю появятся после ближайшего обновления."; $("wildPrice").textContent = "Скоро"; fresh.set(d && d.updated_at); }
+    if (d && d.cities && d.season_label) render(d);
+    else {
+      $("seasonLabel").textContent = "Обновляю данные…";
+      $("planPrice").textContent = "Скоро"; $("wildPrice").textContent = "Скоро";
+      fresh.set(d && d.updated_at);
+      requestRefresh();
+    }
   });
   loadTodos();
   if (location.hash === "#refresh") {  // кнопка «Обновить» из Telegram
     history.replaceState(null, "", location.pathname + location.search);
     requestRefresh();
+  } else if (location.hash === "#season") {
+    const wait = setInterval(() => { if (D) { clearInterval(wait); openEditor(); $("season").scrollIntoView({ behavior: "smooth" }); } }, 300);
   }
 </script>
 </body>

@@ -81,6 +81,34 @@
       return { set(v) { iso = v; paint(); }, busy(v, text) { busy = v; if (text) { el.classList.remove("stale"); el.textContent = text; } else paint(); }, get: () => iso };
     },
 
+    /* сезон поиска и «наши даты»: общие для всех, хранятся в Supabase */
+    settings() {
+      return fetch(SB_URL + "/rest/v1/trip_settings?id=eq.1&select=settings", { headers: H })
+        .then((r) => (r.ok ? r.json() : [])).then((rows) => (rows[0] ? rows[0].settings : null)).catch(() => null);
+    },
+    saveSettings(s) {
+      return fetch(SB_URL + "/rest/v1/trip_settings?id=eq.1", {
+        method: "PATCH", headers: { ...H, Prefer: "return=minimal" },
+        body: JSON.stringify({ settings: s, updated_at: new Date().toISOString() }),
+      }).then((r) => { if (!r.ok) throw new Error("save"); });
+    },
+    MONTHS: ["январь", "февраль", "март", "апрель", "май", "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"],
+    monthLabel: (ym) => T.MONTHS[+ym.slice(5, 7) - 1] + " " + ym.slice(0, 4),
+    span(from, to) {
+      if (from === to) return T.dm(from);
+      return from.slice(0, 7) === to.slice(0, 7) ? T.dt(from).getDate() + "–" + T.dm(to) : T.dm(from) + " – " + T.dm(to);
+    },
+    content: () => T.json("content.json"),
+    speak(text) {
+      if (!("speechSynthesis" in window)) return false;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "zh-CN"; u.rate = 0.8;
+      const v = speechSynthesis.getVoices().find((x) => /zh/i.test(x.lang));
+      if (v) u.voice = v;
+      speechSynthesis.cancel(); speechSynthesis.speak(u);
+      return true;
+    },
+
     /* готовые данные из Supabase (data, prices, history); если недоступно, берём снимок из репозитория */
     blob(name) {
       return fetch(SB_URL + "/rest/v1/radar_blob?select=body&name=eq." + name, { headers: H })
