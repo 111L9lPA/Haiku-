@@ -286,6 +286,77 @@ async function buildData(token: string, s: Settings) {
   return { data, alerts, points };
 }
 
+// ---------- отдельный отпуск Никиты: 1–23 августа 2027 ----------
+// Не меняет настройки основного поиска или Telegram-уведомления.
+// Сохраняет все доступные уникальные комбинации и историю цен по каждой.
+const NIKITA_START = "2027-08-01";
+const NIKITA_END = "2027-08-23";
+type NikitaPoint = { at: string; price: number };
+type NikitaHistory = Record<string, NikitaPoint[]>;
+const nikitaKey = (i: Item) => [i.o, i.x, i.d, i.r, i.a ?? "", i.t ?? "", i.rt ?? ""].join("|");
+
+async function refreshNikita(force = false): Promise<{ status: string; updated_at?: string; count?: number; error?: string }> {
+  const previous = await blob<{ updated_at: string; items: Item[] }>("nikita_prices");
+  const age = previous?.updated_at ? Date.now() - Date.parse(previous.updated_at) : Infinity;
+  if (!force && age < 3 * 3600e3) return { status: "fresh", updated_at: previous!.updated_at, count: previous!.items.length };
+  const lock = await kv<number>("nikita_lock");
+  if (lock && Date.now() - lock < 180_000) return { status: "busy", updated_at: previous?.updated_at, count: previous?.items.length };
+  await setKv("nikita_lock", Date.now());
+  try {
+    const token = await kv<string>("tp");
+    if (!token) return { status: "error", error: "Travelpayouts token is missing" };
+    const jobs: [string, string][] = [];
+    for (const o of ORIGINS) for (const x of CITIES) jobs.push([o.code, x.code]);
+    const quotes = new Map<string, Item>();
+    let routesOk = 0;
+    await pool(jobs, 8, async ([o, x]) => {
+      const raw = await fetchRoute(token, o, x, "2027-08", "2027-08");
+      if (!raw) return;
+      routesOk++;
+      for (const q of raw) {
+        const d = String(q.departure_at ?? "").slice(0, 10);
+        const r = String(q.return_at ?? "").slice(0, 10);
+        if (d < NIKITA_START || r > NIKITA_END || r <= d || !Number.isFinite(Number(q.price)) || Number(q.price) <= 0) continue;
+        const item: Item = {
+          o, x, d, r, p: Math.round(Number(q.price)),
+          a: q.airline ?? undefined, t: q.transfers ?? undefined,
+          rt: q.return_transfers ?? undefined, l: shortLink(q.link),
+        };
+        const key = nikitaKey(item);
+        const current = quotes.get(key);
+        // API возвращает агрегированные предложения; храним минимальную цену для каждой
+        // комбинации дат, направления, перевозчика и количества пересадок.
+        if (!current || item.p < current.p) quotes.set(key, item);
+      }
+    });
+    if (!routesOk) throw new Error("Travelpayouts не ответил ни по одному направлению");
+    const now = new Date().toISOString();
+    const items = [...quotes.values()].sort((a, b) => a.p - b.p || a.d.localeCompare(b.d));
+    const oldHistory = (await blob<NikitaHistory>("nikita_history")) ?? {};
+    const history: NikitaHistory = {};
+    for (const item of items) {
+      const key = nikitaKey(item);
+      const points = oldHistory[key] ?? [];
+      const last = points[points.length - 1];
+      // Записываем снимок каждого найденного билета при каждом успешном поиске.
+      const next = !last || last.at !== now ? [...points, { at: now, price: item.p }] : points;
+      history[key] = next.slice(-60);
+    }
+    // Записываем историю до публикации списка, чтобы страница не увидела разное время.
+    await setBlob("nikita_history", history);
+    await setBlob("nikita_prices", {
+      updated_at: now, dates: [NIKITA_START, NIKITA_END],
+      count: items.length, routes_ok: routesOk, routes_total: jobs.length, items,
+    });
+    return { status: "ok", updated_at: now, count: items.length };
+  } catch (e) {
+    console.error("nikita refresh", e);
+    return { status: "error", error: String((e as Error).message ?? e), updated_at: previous?.updated_at, count: previous?.items?.length };
+  } finally {
+    await setKv("nikita_lock", 0);
+  }
+}
+
 // ---------- обновление целиком ----------
 async function refresh(source: string, force = false): Promise<{ status: string; data?: Data; error?: string }> {
   const s = await settings();
@@ -309,6 +380,8 @@ async function refresh(source: string, force = false): Promise<{ status: string;
     const { data: fresh, alerts } = await buildData(token, s);
     console.log(`refresh (${source}): ${fresh.count} вариантов, ${fresh.routes_ok}/${fresh.routes_total} маршрутов, ${Date.now() - t0} мс`);
     await updateTelegram(fresh, alerts);
+    // Отдельный поиск отпуска обновляется после основного и не задерживает Telegram.
+    EdgeRuntime.waitUntil(refreshNikita().then((r) => console.log("nikita", JSON.stringify(r))).catch((e) => console.error("nikita", e)));
     return { status: "ok", data: fresh };
   } catch (e) {
     console.error("refresh error", e);
@@ -858,6 +931,10 @@ Deno.serve(async (req) => {
   if (body.action === "digest") {
     EdgeRuntime.waitUntil(sendDigest().then((r) => console.log("digest", JSON.stringify(r))));
     return reply({ ok: true, status: "started" });
+  }
+  if (body.action === "nikita_refresh") {
+    const result = await refreshNikita();
+    return reply({ ok: result.status !== "error", ...result }, result.status === "error" ? 500 : 200);
   }
   if (body.action === "refresh") {
     if (body.source === "cron") {
