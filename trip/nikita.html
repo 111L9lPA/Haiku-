@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0d0a12">
+  <title>🏖️ Отпуск Никиты — Китай-радар</title>
+  <meta name="description" content="Все доступные билеты в Китай на 1–23 августа 2027 и история изменения цен">
+  <link rel="stylesheet" href="common.css?v=7">
+  <style>
+    :root { color-scheme:dark }
+    body { background:#0d0a12;color:#f6efe4;font-family:system-ui,-apple-system,sans-serif;margin:0;line-height:1.5 }
+    *,*::before,*::after { box-sizing:border-box }
+    .wrap { max-width:900px;margin:auto;padding:22px 15px 75px }
+    a { color:#ffd182 }
+    .back { display:inline-flex;gap:8px;color:#c6bcae;text-decoration:none;margin-bottom:22px;font-size:14px }
+    h1 {font-size:clamp(25px,6.5vw,40px);margin:2px 0 8px;line-height:1.2}
+    .sub {color:#bbb2a8;font-size:14px;margin:0 0 18px}
+    .panel {background:#17121d;border:1px solid #37303c;border-radius:18px;padding:16px;margin:12px 0}
+    .head {display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+    .tag {display:inline-block;background:#39301b;color:#ffd182;border-radius:50px;padding:5px 10px;font-size:12px;font-weight:700}
+    .stats {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0}
+    .stat {border:1px solid #38303c;border-radius:13px;padding:12px;background:#1d1724}
+    .stat b {display:block;font-size:clamp(17px,4vw,24px);word-break:break-word}
+    .stat span,.muted {color:#b3aab9;font-size:12px}
+    h2 {font-size:19px;margin:0 0 12px}
+    .filters {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    label {display:flex;flex-direction:column;gap:5px;font-size:12px;color:#ccc0ce}
+    select,input {width:100%;min-width:0;background:#241c2c;color:#f6efe4;border:1px solid #514452;border-radius:11px;padding:10px 9px;font:inherit;font-size:13px}
+    .wide {grid-column:1/-1}
+    button {font:inherit;cursor:pointer}
+    .btn {border:1px solid #a58c62;border-radius:12px;background:#f4b942;color:#191111;padding:11px 15px;font-weight:750}
+    .ghost {background:#241c2c;border:1px solid #54465b;color:#f6efe4;border-radius:12px;padding:10px 13px}
+    .actions {display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .offer {padding:14px 0;border-bottom:1px solid #3a303d}
+    .offer:last-child {border-bottom:0}
+    .offerTitle {display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .price {color:#ffd182;font-size:21px;font-weight:850;white-space:nowrap}
+    .route {font-weight:750;font-size:15px}
+    .details {color:#bdb3c2;font-size:13px;margin:6px 0}
+    .links {display:flex;gap:13px;align-items:center;margin-top:9px;flex-wrap:wrap}
+    .links a,.links button {font-size:13px}
+    .hist {margin-top:12px;padding:12px;background:#211a28;border-radius:12px}
+    .hist svg {width:100%;height:95px;display:block}
+    .hist text {font-size:11px;fill:#c5b9ca}
+    .empty {color:#d5cbd9;padding:20px 4px}
+    .foot {font-size:12px;color:#aea2b7;margin-top:24px}
+    .sr {position:absolute;left:-9999px}
+    @media(min-width:690px){.filters{grid-template-columns:repeat(4,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="./">← Вернуться в Китай-радар</a>
+  <div class="head">
+    <div>
+      <span class="tag">🏖️ Отдельный поиск</span>
+      <h1>Отпуск Никиты</h1>
+      <p class="sub">1–23 августа 2027 · любые города Китая · билеты туда-обратно</p>
+    </div>
+    <button class="btn" type="button" id="refresh">↻ Обновить цены</button>
+  </div>
+  <div class="stats" aria-live="polite">
+    <div class="stat"><span>Лучшая цена</span><b id="best">—</b></div>
+    <div class="stat"><span>Вариантов</span><b id="count">—</b></div>
+    <div class="stat"><span>Проверено маршрутов</span><b id="routes">—</b></div>
+  </div>
+  <p class="muted" id="freshness" aria-live="polite">Получаю данные…</p>
+  <section class="panel" aria-labelledby="filtersTitle">
+    <div class="head"><h2 id="filtersTitle">Фильтры</h2><button class="ghost" id="reset" type="button">Сбросить</button></div>
+    <p class="muted">По умолчанию — вообще все найденные билеты в пределах отпуска, по возрастанию цены.</p>
+    <div class="filters">
+      <label>Вылет с<input type="date" id="departFrom" min="2027-08-01" max="2027-08-23" value="2027-08-01"></label>
+      <label>Вылет по<input type="date" id="departTo" min="2027-08-01" max="2027-08-23" value="2027-08-23"></label>
+      <label>Обратно с<input type="date" id="returnFrom" min="2027-08-01" max="2027-08-23" value="2027-08-01"></label>
+      <label>Обратно по<input type="date" id="returnTo" min="2027-08-01" max="2027-08-23" value="2027-08-23"></label>
+      <label>Откуда<select id="origin"><option value="">Москва и Краснодар</option><option value="MOW">Москва</option><option value="KRR">Краснодар</option></select></label>
+      <label>Город Китая<select id="city"><option value="">Все города</option></select></label>
+      <label>Авиакомпания<select id="airline"><option value="">Любая</option></select></label>
+      <label>Пересадки<select id="stops"><option value="">Любые</option><option value="0">Без пересадок в обе стороны</option><option value="1">Не более одной в каждую сторону</option></select></label>
+      <label>Цена до, ₽ (необязательно)<input id="maxPrice" type="number" inputmode="numeric" min="0" placeholder="Без ограничений"></label>
+      <label>Минимум дней (необязательно)<input id="minNights" type="number" inputmode="numeric" min="0" max="22" placeholder="Любая длительность"></label>
+    </div>
+  </section>
+  <section class="panel" aria-labelledby="resultsTitle">
+    <div class="head">
+      <h2 id="resultsTitle">Все найденные предложения</h2>
+      <span class="muted" id="shown"></span>
+    </div>
+    <div id="offers" aria-live="polite"><p class="empty">Загружаю предложения…</p></div>
+    <div class="actions"><button class="ghost" id="more" type="button" hidden>Показать ещё 50</button></div>
+  </section>
+  <p class="foot">История цены сохраняется при каждом успешном обновлении в Supabase (до 60 точек для каждого предложения). Данные Travelpayouts — доступные агрегированные предложения, а не гарантированно все рейсы на рынке. Цена и наличие могут измениться перед покупкой. Поиск отпуска не изменяет обычные уведомления Telegram.</p>
+</main>
+<script src="common.js?v=7"></script>
+<script>
+(function(){
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const START = "2027-08-01", END = "2027-08-23";
+  const CITY = {
+    BJS:"Пекин",SHA:"Шанхай",CAN:"Гуанчжоу",SZX:"Шэньчжэнь",HKG:"Гонконг",
+    CTU:"Чэнду",CKG:"Чунцин",XIY:"Сиань",HGH:"Ханчжоу",NKG:"Нанкин",
+    KMG:"Куньмин",KWL:"Гуйлинь",SYX:"Санья",HAK:"Хайкоу",XMN:"Сямэнь",
+    WUH:"Ухань",CSX:"Чанша",TAO:"Циндао",DLC:"Далянь",TSN:"Тяньцзинь",
+    SHE:"Шэньян",HRB:"Харбин",URC:"Урумчи"
+  };
+  let source=[],history={},filtered=[],page=50,updatedAt=null;
+  const key=i=>[i.o,i.x,i.d,i.r,i.a??"",i.t??"",i.rt??""].join("|");
+  const money=n=>Number(n).toLocaleString("ru-RU")+" ₽";
+  const nights=i=>Math.round((Date.parse(i.r+"T00:00:00Z")-Date.parse(i.d+"T00:00:00Z"))/864e5);
+  const fmt=d=>new Date(d+"T00:00:00").toLocaleDateString("ru-RU",{day:"numeric",month:"short"});
+  const text=(el,s)=>{el.textContent=s};
+  const escaped=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const selectOption=(s,v,label)=>{const o=document.createElement("option");o.value=v;o.textContent=label;s.append(o)};
+  function populate(){
+    const cities=[...new Set(source.map(i=>i.x))].sort((a,b)=>(CITY[a]??a).localeCompare(CITY[b]??b,"ru"));
+    for(const x of cities)selectOption($("city"),x,CITY[x]??x);
+    const airlines=[...new Set(source.map(i=>i.a).filter(Boolean))].sort();
+    for(const a of airlines)selectOption($("airline"),a,a);
+  }
+  function reset(){
+    for(const id of ["origin","city","airline","stops","maxPrice","minNights"])$(id).value="";
+    $("departFrom").value=$("returnFrom").value=START;
+    $("departTo").value=$("returnTo").value=END;
+    apply();
+  }
+  function apply(){
+    const df=$("departFrom").value||START,dt=$("departTo").value||END;
+    const rf=$("returnFrom").value||START,rt=$("returnTo").value||END;
+    const o=$("origin").value,c=$("city").value,a=$("airline").value,st=$("stops").value;
+    const cap=Number($("maxPrice").value)||Infinity, min=Math.max(0,Number($("minNights").value)||0);
+    filtered=source.filter(i=>i.d>=df&&i.d<=dt&&i.r>=rf&&i.r<=rt&&
+      (!o||i.o===o)&&(!c||i.x===c)&&(!a||i.a===a)&&
+      (!st||(i.t!=null&&i.rt!=null&&i.t<=Number(st)&&i.rt<=Number(st)))&&
+      i.p<=cap&&nights(i)>=min);
+    filtered.sort((a,b)=>a.p-b.p||a.d.localeCompare(b.d));
+    page=50;render();
+  }
+  function chart(pts){
+    if(pts.length<2)return "<p class='muted'>Пока одна точка истории. Динамика появится после следующих обновлений.</p>";
+    const prices=pts.map(p=>p.price),min=Math.min(...prices),max=Math.max(...prices),span=max-min||1;
+    const coordinates=pts.map((p,i)=>({x:10+(i/(pts.length-1))*330,y:80-((p.price-min)/span)*65}));
+    const line=coordinates.map(p=>p.x.toFixed(1)+","+p.y.toFixed(1)).join(" ");
+    return '<svg viewBox="0 0 350 105" role="img" aria-label="График цены"><polyline points="'+line+'" fill="none" stroke="#f4b942" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><text x="5" y="100">'+escaped(money(min))+'</text><text x="340" y="15" text-anchor="end">'+escaped(money(max))+'</text></svg>';
+  }
+  function render(){
+    text($("shown"),filtered.length.toLocaleString("ru-RU")+" вариантов по фильтру");
+    const root=$("offers");root.textContent="";
+    if(!filtered.length){const p=document.createElement("p");p.className="empty";p.textContent=source.length?"Под эти фильтры билетов не найдено. Попробуй сбросить ограничения.":"Пока нет сохранённых предложений. Нажми «Обновить цены».";root.append(p)}
+    const fragment=document.createDocumentFragment();
+    for(const i of filtered.slice(0,page)){
+      const div=document.createElement("article");div.className="offer";
+      const detail=history[key(i)]||[];
+      const delta=detail.length>1?i.p-detail[0].price:null;
+      const origin=i.o==="MOW"?"Москва":i.o==="KRR"?"Краснодар":i.o;
+      const name=CITY[i.x]??i.x;
+      const direct=i.t===0&&i.rt===0?"без пересадок":(i.t??"?")+" / "+(i.rt??"?")+" пересадок (туда / обратно)";
+      const url=i.l?"https://www.aviasales.ru"+i.l:null;
+      div.innerHTML='<div class="offerTitle"><span class="route">'+escaped(origin)+' → '+escaped(name)+'</span><span class="price">'+escaped(money(i.p))+'</span></div>'+
+        '<div class="details">'+escaped(fmt(i.d))+' — '+escaped(fmt(i.r))+' · '+nights(i)+' дн. · '+escaped(direct)+'</div>'+
+        '<div class="details">Перевозчик: '+escaped(i.a||"не указан")+(delta!==null?" · от первой цены "+escaped((delta>0?"+":"")+money(delta)):"")+'</div>'+
+        '<div class="links">'+(url?'<a href="'+escaped(url)+'" target="_blank" rel="noopener noreferrer">Посмотреть билет ↗</a>':"<span class='muted'>Ссылка не предоставлена источником</span>")+
+        '<button type="button" class="ghost historyBtn">📈 История: '+detail.length+'</button></div>';
+      div.querySelector(".historyBtn").addEventListener("click",()=>{
+        let h=div.querySelector(".hist");
+        if(h){h.remove();return}
+        h=document.createElement("div");h.className="hist";
+        h.innerHTML="<b>История изменения цены</b>"+chart(detail)+"<p class='muted'>"+
+          escaped(detail.map(p=>new Date(p.at).toLocaleString("ru-RU",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})+": "+money(p.price)).join(" · "))+"</p>";
+        div.append(h);
+      });
+      fragment.append(div);
+    }
+    root.append(fragment);
+    $("more").hidden=filtered.length<=page;
+  }
+  async function load(){
+    text($("freshness"),"Получаю сохранённые данные из Supabase…");
+    const [r,h]=await Promise.all([T.blob("nikita_prices"),T.blob("nikita_history")]);
+    if(!r||!Array.isArray(r.items)){
+      source=[];history={};text($("freshness"),"Пока нет августовских данных в Supabase. После публикации серверной функции нажми «Обновить цены».");apply();return;
+    }
+    source=r.items.filter(i=>i&&i.p>0&&i.d>=START&&i.r<=END&&i.r>i.d);
+    history=h&&typeof h==="object"?h:{};
+    updatedAt=r.updated_at;
+    text($("best"),source.length?money(Math.min(...source.map(i=>i.p))):"—");
+    text($("count"),source.length.toLocaleString("ru-RU"));
+    text($("routes"),String(r.routes_ok??"?")+"/"+String(r.routes_total??"?"));
+    text($("freshness"),"Последнее обновление: "+(updatedAt?new Date(updatedAt).toLocaleString("ru-RU"):"неизвестно"));
+    $("city").length=1;$("airline").length=1;populate();apply();
+  }
+  async function refresh(){
+    $("refresh").disabled=true;text($("refresh"),"🔎 Ищу билеты…");
+    try{
+      const res=await fetch(T.SB_URL+"/functions/v1/radar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"nikita_refresh"})});
+      const data=await res.json();
+      if(!res.ok||data.status==="error")throw Error(data.error||"Ошибка поиска");
+      if(data.status==="busy"){text($("freshness"),"Поиск уже выполняется. Повтори обновление чуть позже.");return}
+      await load();
+    }catch(e){text($("freshness"),"Не удалось обновить августовские цены: "+e.message+". Сохранённые данные остаются доступными.")}
+    finally{$("refresh").disabled=false;text($("refresh"),"↻ Обновить цены")}
+  }
+  for(const id of ["departFrom","departTo","returnFrom","returnTo","origin","city","airline","stops","maxPrice","minNights"]){
+    $(id).addEventListener("input",apply);$(id).addEventListener("change",apply);
+  }
+  $("reset").addEventListener("click",reset);
+  $("more").addEventListener("click",()=>{page+=50;render()});
+  $("refresh").addEventListener("click",refresh);
+  load().catch(e=>text($("freshness"),"Ошибка загрузки: "+e.message));
+})();
+</script>
+</body>
+</html>
